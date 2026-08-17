@@ -1,0 +1,565 @@
+{
+  "_meta": {
+    "description": "Seed dataset of Ig Nobel Prize winners used as source material for short-form videos.",
+    "source_of_truth": "https://improbable.com/ig/winners/",
+    "verification": "Entries marked verified='pubmed' have a confirmed PMID/DOI. Everything else is seeded from model knowledge and MUST be checked against the official winners list before publishing. Run scripts/fetch_winners.py on a machine with open network access to refresh and expand this file.",
+    "schema": {
+      "id": "slug used for filenames",
+      "year": "award year",
+      "category": "Ig Nobel category as awarded",
+      "laureates": "who received it",
+      "citation": "what they won it for, in plain language",
+      "hook": "first 2 seconds. Must create a question, never mention the prize.",
+      "beats": "3-5 escalating story beats, spoken order",
+      "twist": "the payoff. The single most surprising fact.",
+      "kicker": "closing line, ideally reframing the absurdity as legitimate",
+      "tags": "topic tags for scheduling variety",
+      "verified": "pubmed | unverified",
+      "refs": "citations backing the claims"
+    }
+  },
+  "prizes": [
+    {
+      "id": "polyester-rats",
+      "year": 2016,
+      "category": "Reproduction",
+      "laureates": "Ahmed Shafik",
+      "citation": "For testing the effects of wearing polyester, cotton, or wool trousers on the sex life of rats.",
+      "hook": "A scientist put tiny polyester pants on 75 rats.",
+      "beats": [
+        "He split them into five groups. Polyester, poly-cotton, pure cotton, pure wool, and one group left naked.",
+        "Then he waited a full year, measuring how often each group mated.",
+        "The cotton and wool rats were fine. The polyester rats stopped having sex almost entirely."
+      ],
+      "twist": "The polyester was generating static electricity across their bodies. The fabric was literally electrifying them out of the mood.",
+      "kicker": "Take the pants off, and six months later they were back to normal. It was published in European Urology.",
+      "tags": ["animals", "sex", "materials"],
+      "verified": "pubmed",
+      "refs": [
+        "Shafik A. Effect of different types of textiles on sexual activity. Experimental study. Eur Urol. 1993;24(3):375-80. PMID 8262106. DOI 10.1159/000474332"
+      ]
+    },
+    {
+      "id": "levitating-frog",
+      "year": 2000,
+      "category": "Physics",
+      "laureates": "Andre Geim and Michael Berry",
+      "citation": "For using magnets to levitate a frog.",
+      "hook": "In 2000, two physicists made a live frog float in mid-air.",
+      "beats": [
+        "No wires, no trick. Just a magnetic field about 400,000 times stronger than the Earth's.",
+        "Every atom in the frog is very slightly magnetic in the opposite direction. Crank the field high enough and the whole animal pushes away from it.",
+        "The frog was completely unharmed. It just hovered there, confused."
+      ],
+      "twist": "Ten years later, that same scientist, Andre Geim, won an actual Nobel Prize in Physics for discovering graphene.",
+      "kicker": "He is the only person alive holding both a Nobel and an Ig Nobel.",
+      "tags": ["physics", "animals", "famous"],
+      "verified": "unverified",
+      "refs": ["Berry MV, Geim AK. Of flying frogs and levitrons. Eur J Phys. 1997;18:307."]
+    },
+    {
+      "id": "cheese-mosquitoes",
+      "year": 2006,
+      "category": "Biology",
+      "laureates": "Bart Knols and Ruurd de Jong",
+      "citation": "For showing that the malaria mosquito is attracted equally to the smell of Limburger cheese and to the smell of human feet.",
+      "hook": "The mosquito that spreads malaria is obsessed with one specific cheese.",
+      "beats": [
+        "Researchers found that Anopheles gambiae doesn't bite you at random. It goes for your feet.",
+        "So they tested what else smells like feet. Limburger cheese scored an identical hit.",
+        "Same bacteria. The microbe that ripens the cheese is a close relative of the one living between your toes."
+      ],
+      "twist": "The finding got used for real. Limburger cheese has been deployed as bait in mosquito traps in Africa.",
+      "kicker": "A cheese joke became a malaria control tool.",
+      "tags": ["biology", "disease", "food"],
+      "verified": "unverified",
+      "refs": ["De Jong R, Knols BGJ. Limburger cheese as an attractant for the malaria mosquito. Lancet. 1995."]
+    },
+    {
+      "id": "dead-salmon-fmri",
+      "year": 2012,
+      "category": "Neuroscience",
+      "laureates": "Craig Bennett, Abigail Baird, Michael Miller, George Wolford",
+      "citation": "For demonstrating that brain researchers, by using complicated instruments and simple statistics, can see meaningful brain activity anywhere, even in a dead salmon.",
+      "hook": "Scientists put a dead fish in a brain scanner and it responded.",
+      "beats": [
+        "They bought a whole Atlantic salmon. Dead. From a shop.",
+        "They slid it into an fMRI machine and showed it photographs of people, asking it to guess what emotion each person was feeling.",
+        "The scan lit up. The dead salmon's brain showed activity in response to the photos."
+      ],
+      "twist": "It was never about the fish. They were proving that standard brain-scan statistics produce fake results if you don't correct them properly.",
+      "kicker": "The dead salmon changed how neuroscience papers are reviewed. It is one of the most cited jokes in science.",
+      "tags": ["neuroscience", "statistics", "methods"],
+      "verified": "unverified",
+      "refs": ["Bennett CM et al. Neural correlates of interspecies perspective taking in the post-mortem Atlantic salmon. 2009."]
+    },
+    {
+      "id": "upside-down-rhinos",
+      "year": 2021,
+      "category": "Transportation",
+      "laureates": "Robin Radcliffe and colleagues",
+      "citation": "For determining by experiment whether it is safer to transport an airborne rhinoceros upside down.",
+      "hook": "Conservationists needed to know if it's safer to airlift a rhino upside down.",
+      "beats": [
+        "Rhinos get moved between reserves by helicopter, dangling from a strap.",
+        "Nobody knew whether hanging them by the feet, upside down, was slowly suffocating them.",
+        "So the team tranquilised twelve rhinos in Namibia and measured their oxygen levels in both positions."
+      ],
+      "twist": "Upside down was better. The inverted rhinos had measurably better oxygen levels than the ones lying on their side.",
+      "kicker": "That result is now standard practice in rhino conservation.",
+      "tags": ["animals", "conservation", "medicine"],
+      "verified": "unverified",
+      "refs": ["Radcliffe RW et al. J Wildl Dis. 2021."]
+    },
+    {
+      "id": "wombat-cubes",
+      "year": 2019,
+      "category": "Physics",
+      "laureates": "Patricia Yang, David Hu and colleagues",
+      "citation": "For studying how, and why, wombats make cube-shaped poo.",
+      "hook": "The wombat is the only animal on Earth that produces cube-shaped poop.",
+      "beats": [
+        "Not roughly cubic. Actual cubes, with flat faces and defined edges, about two centimetres across.",
+        "For decades nobody could explain it. There is no square hole.",
+        "The team dissected wombat intestines and inflated them like balloons to find out where the shape comes from."
+      ],
+      "twist": "The last section of the gut has stiff and soft regions alternating around the ring. As waste is squeezed through, the soft parts stretch and the stiff parts form the corners.",
+      "kicker": "Engineers are now studying it as a new way to manufacture cubes without cutting or moulding.",
+      "tags": ["animals", "engineering", "gross"],
+      "verified": "unverified",
+      "refs": ["Yang PJ et al. Soft Matter. 2021."]
+    },
+    {
+      "id": "cats-liquid",
+      "year": 2017,
+      "category": "Physics",
+      "laureates": "Marc-Antoine Fardin",
+      "citation": "For using fluid dynamics to probe the question: can a cat be both a solid and a liquid?",
+      "hook": "A physicist proved, mathematically, that cats are a liquid.",
+      "beats": [
+        "The definition of a liquid is a material that takes the shape of its container.",
+        "Cats do exactly that. Put one in a sink, a box, a vase, and it fills the shape.",
+        "So he applied the actual equations of rheology, using something called the Deborah number, which measures how long a material takes to flow into its container."
+      ],
+      "twist": "The answer is that it depends on the timescale. On short timescales a cat is a solid. Give it enough time in a box, and it is genuinely a liquid.",
+      "kicker": "The paper is a real fluid dynamics lesson, wrapped in a cat joke.",
+      "tags": ["physics", "animals", "maths"],
+      "verified": "unverified",
+      "refs": ["Fardin MA. Rheol Bull. 2014;83:16-17."]
+    },
+    {
+      "id": "coffee-walking-backwards",
+      "year": 2017,
+      "category": "Fluid Dynamics",
+      "laureates": "Jiwon Han",
+      "citation": "For studying the dynamics of liquid-sloshing, to learn what happens when a person walks backwards while carrying a cup of coffee.",
+      "hook": "There is a scientific reason you always spill your coffee, and a proven fix.",
+      "beats": [
+        "A cup of coffee has a natural sloshing frequency. Human walking happens at almost exactly that frequency.",
+        "So every step pumps energy into the wave, like pushing a swing at just the right moment. The wave grows until it goes over the rim.",
+        "The researcher tested ways to break the rhythm."
+      ],
+      "twist": "Walking backwards works. It disrupts the resonance and dramatically cuts spilling. So does holding the cup by the rim from above, instead of by the handle.",
+      "kicker": "He was an undergraduate when he did this. It won him an Ig Nobel.",
+      "tags": ["physics", "everyday", "useful"],
+      "verified": "unverified",
+      "refs": ["Han J. Achievements in the Life Sciences. 2016."]
+    },
+    {
+      "id": "sword-swallowing",
+      "year": 2007,
+      "category": "Medicine",
+      "laureates": "Brian Witcombe and Dan Meyer",
+      "citation": "For their penetrating medical report 'Sword Swallowing and Its Side Effects'.",
+      "hook": "A doctor surveyed professional sword swallowers about their injuries.",
+      "beats": [
+        "He contacted the Sword Swallowers Association International and got responses from 46 performers.",
+        "The main finding: sword swallowing is mostly safe, until something breaks the routine.",
+        "Injuries spiked when performers were distracted, swallowing multiple blades at once, or using unusual shapes."
+      ],
+      "twist": "The most dangerous variant reported wasn't a bigger sword. It was a curved sabre, and one performer was injured while being distracted by a macaw on his shoulder.",
+      "kicker": "It was published in the British Medical Journal, and it is genuinely useful to emergency doctors.",
+      "tags": ["medicine", "performers", "injury"],
+      "verified": "unverified",
+      "refs": ["Witcombe B, Meyer D. BMJ. 2006;333:1285-7."]
+    },
+    {
+      "id": "rollercoaster-kidney-stones",
+      "year": 2018,
+      "category": "Medicine",
+      "laureates": "Marc Mitchell and David Wartinger",
+      "citation": "For using roller coaster rides to try to hasten the passage of kidney stones.",
+      "hook": "A urologist kept hearing the same story from patients: they rode a roller coaster and passed their kidney stone.",
+      "beats": [
+        "One patient passed three stones on three consecutive rides on the same ride.",
+        "So the doctor 3D-printed a silicone model of a human kidney, loaded it with real stones and urine, and put it in a backpack.",
+        "Then he rode the roller coaster twenty times, holding the kidney at waist height."
+      ],
+      "twist": "It worked. Sitting in the back of the ride passed stones about 64 percent of the time. Sitting at the front dropped it to 17 percent.",
+      "kicker": "The ride was Big Thunder Mountain at Disney World.",
+      "tags": ["medicine", "weird-method", "useful"],
+      "verified": "unverified",
+      "refs": ["Mitchell MA, Wartinger DD. J Am Osteopath Assoc. 2016;116(10):647-652."]
+    },
+    {
+      "id": "bee-sting-map",
+      "year": 2015,
+      "category": "Physiology and Entomology",
+      "laureates": "Michael Smith",
+      "citation": "For arranging for honey bees to sting him repeatedly on 25 different locations on his body, to learn which locations are least and most painful.",
+      "hook": "A researcher let bees sting him on 25 different body parts to map the pain.",
+      "beats": [
+        "He did it to himself, five stings a day, for 38 days, always between 9 and 10 in the morning to keep conditions identical.",
+        "Each sting stayed in for a full 60 seconds. He rated the pain out of ten.",
+        "The least painful spots were the skull, the middle toe tip, and the upper arm. Basically nothing."
+      ],
+      "twist": "The worst three, in order, were the nostril, the upper lip, and the penis shaft. The nostril was so bad it caused violent sneezing and streaming eyes.",
+      "kicker": "He is now a real bee researcher, and this is his most cited paper.",
+      "tags": ["pain", "insects", "self-experiment"],
+      "verified": "unverified",
+      "refs": ["Smith ML. PeerJ. 2014;2:e338."]
+    },
+    {
+      "id": "slime-mould-maze",
+      "year": 2008,
+      "category": "Cognitive Science",
+      "laureates": "Toshiyuki Nakagaki and colleagues",
+      "citation": "For discovering that slime moulds can solve puzzles.",
+      "hook": "A single-celled blob with no brain solved a maze.",
+      "beats": [
+        "Slime mould is one organism, one cell, no neurons at all.",
+        "Researchers put it in a maze with food at two exits. It spread out to fill every corridor, then retracted from the dead ends.",
+        "What was left was the shortest possible path between the two food sources."
+      ],
+      "twist": "Later they laid out oat flakes matching the cities around Tokyo. The slime mould built a network almost identical to the actual Tokyo rail system, which took human engineers decades to design.",
+      "kicker": "No brain required.",
+      "tags": ["biology", "intelligence", "networks"],
+      "verified": "unverified",
+      "refs": ["Nakagaki T et al. Nature. 2000;407:470. Tero A et al. Science. 2010;327:439-442."]
+    },
+    {
+      "id": "duck-necrophilia",
+      "year": 2003,
+      "category": "Biology",
+      "laureates": "Kees Moeliker",
+      "citation": "For documenting the first scientifically recorded case of homosexual necrophilia in the mallard duck.",
+      "hook": "A museum curator heard a bang on the window and accidentally made scientific history.",
+      "beats": [
+        "A male mallard had flown into the glass of the Rotterdam natural history museum and died on the ground outside.",
+        "Another male mallard landed next to the body.",
+        "What followed lasted 75 minutes, and the curator stood there taking notes and photographs the whole time."
+      ],
+      "twist": "It was the first recorded case of homosexual necrophilia in this species, and it went into the scientific literature.",
+      "kicker": "The museum now marks the anniversary every year. There is a plaque.",
+      "tags": ["animals", "dark", "museum"],
+      "verified": "unverified",
+      "refs": ["Moeliker CW. Deinsea. 2001;8:243-247."]
+    },
+    {
+      "id": "banana-peel-friction",
+      "year": 2014,
+      "category": "Physics",
+      "laureates": "Kiyoshi Mabuchi and colleagues",
+      "citation": "For measuring the amount of friction between a shoe and a banana skin, and between a banana skin and the floor, when a person steps on a banana skin.",
+      "hook": "Someone finally measured whether banana peels are actually slippery.",
+      "beats": [
+        "It's one of the oldest jokes in comedy, and nobody had ever tested the physics.",
+        "The team measured the friction coefficient of a shoe on a banana peel on linoleum.",
+        "Normal shoe-on-floor friction is around 0.4. On a banana peel it drops to about 0.07."
+      ],
+      "twist": "That makes it about six times more slippery, comparable to a well-lubricated joint. The cause is the peel's inner surface, where crushed cells release a gel.",
+      "kicker": "The cartoon was right. The research came from a group studying artificial joints.",
+      "tags": ["physics", "comedy", "everyday"],
+      "verified": "unverified",
+      "refs": ["Mabuchi K et al. Tribology Online. 2012;7(3):147-151."]
+    },
+    {
+      "id": "penguin-poo-pressure",
+      "year": 2005,
+      "category": "Fluid Dynamics",
+      "laureates": "Victor Benno Meyer-Rochow and Jozsef Gal",
+      "citation": "For calculating the pressures that build up inside a penguin, as detailed in 'Pressures Produced When Penguins Pooh'.",
+      "hook": "Two scientists calculated the internal pressure of a pooping penguin.",
+      "beats": [
+        "Nesting penguins don't leave the nest. They stay put and fire their waste outward, away from the nest, in a jet.",
+        "The researchers noticed the streaks in the snow travel a consistent distance, around 40 centimetres.",
+        "So they worked backwards using fluid dynamics to find the pressure needed to launch it that far."
+      ],
+      "twist": "About 60 kilopascals. That is roughly four times the pressure a human generates, and comparable to the pressure inside a car tyre.",
+      "kicker": "The paper won an Ig Nobel and is a legitimately good fluid dynamics exercise.",
+      "tags": ["animals", "physics", "gross"],
+      "verified": "unverified",
+      "refs": ["Meyer-Rochow VB, Gal J. Polar Biol. 2003;27:56-58."]
+    },
+    {
+      "id": "woodpecker-headache",
+      "year": 2006,
+      "category": "Ornithology",
+      "laureates": "Ivan Schwab and Philip May",
+      "citation": "For exploring and explaining why woodpeckers don't get headaches.",
+      "hook": "A woodpecker hits a tree 20 times a second and never gets a concussion.",
+      "beats": [
+        "Each strike hits at around 6 metres per second, decelerating at over 1000 g. That would kill a human many times over.",
+        "The skull has a spongy bone plate that absorbs shock, and the brain is packed so tightly it can't slosh around.",
+        "There is also a tongue bone that wraps all the way around the back of the skull like a seatbelt."
+      ],
+      "twist": "And a millisecond before impact, a muscle contracts to close the eyelids. Not to blink, but to physically hold the eyeball in place so it doesn't pop out.",
+      "kicker": "Helmet designers have been copying this for years.",
+      "tags": ["animals", "biomechanics", "design"],
+      "verified": "unverified",
+      "refs": ["Schwab IR. Br J Ophthalmol. 2002;86(8):843."]
+    },
+    {
+      "id": "full-vs-empty-bottle",
+      "year": 2009,
+      "category": "Peace",
+      "laureates": "Stephan Bolliger and colleagues",
+      "citation": "For determining by experiment whether it is better to be smashed over the head with a full bottle of beer or with an empty bottle.",
+      "hook": "Forensic scientists tested whether a full or empty beer bottle does more damage to a skull.",
+      "beats": [
+        "Bar fights end up in court, and courts need to know if the bottle was full at the moment of impact.",
+        "So the team dropped steel balls onto real beer bottles to find the breaking point of each.",
+        "Full bottles shattered at around 30 joules. Empty ones held out to around 40."
+      ],
+      "twist": "Empty bottles are significantly stronger. But both break well below the force needed to fracture a human skull, meaning either one can crack your head open before the glass gives way.",
+      "kicker": "It won the Ig Nobel Peace Prize, and it gets cited in actual court cases.",
+      "tags": ["forensics", "violence", "legal"],
+      "verified": "unverified",
+      "refs": ["Bolliger SA et al. J Forensic Leg Med. 2009;16(3):138-42."]
+    },
+    {
+      "id": "mri-sex",
+      "year": 2000,
+      "category": "Medicine",
+      "laureates": "Willibrord Weijmar Schultz and colleagues",
+      "citation": "For their illuminating report 'Magnetic Resonance Imaging of Male and Female Genitals During Coitus and Female Sexual Arousal'.",
+      "hook": "In the nineties, researchers asked couples to have sex inside an MRI machine.",
+      "beats": [
+        "Nobody actually knew the internal geometry of human sex. Every anatomical drawing was based on assumption or on cadavers.",
+        "So the team recruited volunteers and got them into a scanner tube 50 centimetres wide.",
+        "The early attempts failed. The machine was loud, cramped, and cold."
+      ],
+      "twist": "The anatomy textbooks turned out to be wrong. The actual shape and angle of the penis during intercourse doesn't match the diagrams that had been printed for centuries, including Leonardo da Vinci's.",
+      "kicker": "It corrected 500 years of anatomical illustration.",
+      "tags": ["medicine", "sex", "anatomy"],
+      "verified": "unverified",
+      "refs": ["Schultz WW et al. BMJ. 1999;319:1596-1600."]
+    },
+    {
+      "id": "nose-picking-survey",
+      "year": 2001,
+      "category": "Public Health",
+      "laureates": "Chittaranjan Andrade and B. S. Srihari",
+      "citation": "For their discovery that nose picking is a common activity among adolescents.",
+      "hook": "Two psychiatrists surveyed 200 teenagers about picking their noses.",
+      "beats": [
+        "They handed out anonymous questionnaires in four schools in Bangalore.",
+        "Almost everybody did it. The average was about four times a day.",
+        "Around 8 percent reported doing it more than twenty times a day."
+      ],
+      "twist": "And roughly one in five said the habit was causing them actual nasal damage, including bleeding. The researchers argued it should be classified alongside nail biting and hair pulling as a genuine compulsive behaviour.",
+      "kicker": "That is why it was published in the Journal of Clinical Psychiatry.",
+      "tags": ["psychology", "gross", "teens"],
+      "verified": "unverified",
+      "refs": ["Andrade C, Srihari BS. J Clin Psychiatry. 2001;62(6):426-31."]
+    },
+    {
+      "id": "country-music-suicide",
+      "year": 2004,
+      "category": "Medicine",
+      "laureates": "Steven Stack and James Gundlach",
+      "citation": "For their published report 'The Effect of Country Music on Suicide'.",
+      "hook": "Two sociologists claimed they could predict a city's suicide rate from its radio stations.",
+      "beats": [
+        "They looked at 49 metropolitan areas in the United States.",
+        "For each one, they measured how much airtime country music got.",
+        "Then they controlled for poverty, divorce rates, and gun availability."
+      ],
+      "twist": "The correlation held. More country airtime lined up with higher white suicide rates. Their argument was that the themes in the lyrics reinforce the conditions that lead to it.",
+      "kicker": "The paper triggered years of academic argument and at least one formal rebuttal. It has never been fully settled.",
+      "tags": ["sociology", "music", "controversial"],
+      "verified": "unverified",
+      "refs": ["Stack S, Gundlach J. Social Forces. 1992;71(1):211-218."]
+    },
+    {
+      "id": "speed-bump-appendicitis",
+      "year": 2015,
+      "category": "Diagnostic Medicine",
+      "laureates": "Diallah Karim and colleagues",
+      "citation": "For determining that acute appendicitis can be accurately diagnosed by the amount of pain evident when the patient is driven over speed bumps.",
+      "hook": "There is a way to diagnose appendicitis using speed bumps.",
+      "beats": [
+        "Doctors kept noticing that patients with appendicitis reported terrible pain on the drive to the hospital.",
+        "So a team formally tested it. They asked patients whether the pain got worse going over speed bumps on the way in.",
+        "Then they compared the answers to surgical outcomes."
+      ],
+      "twist": "It's a strong test. Of the patients whose pain spiked over the bumps, 97 percent of the confirmed appendicitis cases were caught. If the bumps didn't hurt, appendicitis was very unlikely.",
+      "kicker": "It was published in the BMJ and it costs nothing to use.",
+      "tags": ["medicine", "diagnosis", "useful"],
+      "verified": "unverified",
+      "refs": ["Ashdown HF et al. BMJ. 2012;345:e8012."]
+    },
+    {
+      "id": "hiccup-cure",
+      "year": 2006,
+      "category": "Medicine",
+      "laureates": "Francis Fesmire, Majed Odeh and colleagues",
+      "citation": "For the medical case report 'Termination of Intractable Hiccups with Digital Rectal Massage'.",
+      "hook": "There is a documented cure for unstoppable hiccups, and you will not like it.",
+      "beats": [
+        "A patient arrived at the emergency room with hiccups that had not stopped for days. Nothing worked. Not drugs, not breath holding, nothing.",
+        "Intractable hiccups are genuinely dangerous. Patients can't eat or sleep, and it can go on for weeks.",
+        "The doctor reasoned that the hiccup reflex runs through the vagus nerve, and that stimulating the nerve anywhere along its path might reset it."
+      ],
+      "twist": "So he performed a rectal massage. The hiccups stopped immediately. Two separate research teams published the same finding independently.",
+      "kicker": "They shared the Ig Nobel for it. It remains in the medical literature as a legitimate last resort.",
+      "tags": ["medicine", "gross", "cure"],
+      "verified": "unverified",
+      "refs": ["Fesmire FM. Ann Emerg Med. 1988;17(8):872. Odeh M et al. J Intern Med. 1990;227(2):145-6."]
+    },
+    {
+      "id": "bladder-decisions",
+      "year": 2011,
+      "category": "Medicine",
+      "laureates": "Mirjam Tuk and colleagues",
+      "citation": "For demonstrating that people make better decisions about some kinds of things, and worse decisions about other kinds of things, when they have a strong urge to urinate.",
+      "hook": "Needing to pee makes you better at resisting temptation.",
+      "beats": [
+        "Researchers gave participants large amounts of water, then made them wait.",
+        "At peak bladder pressure, they offered a choice: a small reward now, or a much larger reward later.",
+        "The desperate group consistently chose to wait for the bigger payoff."
+      ],
+      "twist": "The theory is that self-control is a single shared system. Clenching to hold it in spills over into every other kind of restraint you're exercising at that moment.",
+      "kicker": "It also works in reverse. That same pressure wrecks your working memory.",
+      "tags": ["psychology", "self-control", "weird-effect"],
+      "verified": "unverified",
+      "refs": ["Tuk MA et al. Psychol Sci. 2011;22(5):627-33."]
+    },
+    {
+      "id": "opera-mice-transplant",
+      "year": 2013,
+      "category": "Medicine",
+      "laureates": "Masateru Uchiyama and colleagues",
+      "citation": "For assessing the effect of listening to opera on heart transplant patients who are mice.",
+      "hook": "Mice that received heart transplants survived longer if you played them opera.",
+      "beats": [
+        "The team gave mice heart transplants, then split them into groups by what they listened to during recovery.",
+        "One group got Verdi's La Traviata. One got Mozart. One got Enya. One got single-frequency tones.",
+        "Untreated, the transplanted hearts were rejected in about seven days."
+      ],
+      "twist": "The opera group lasted 26 days. Mozart got 20. Enya got 11, and the single tones did nothing. The effect ran through the immune system, changing regulatory T cell counts.",
+      "kicker": "Deaf mice showed no benefit, which confirmed they were actually hearing it, not just feeling vibrations.",
+      "tags": ["medicine", "music", "animals"],
+      "verified": "unverified",
+      "refs": ["Uchiyama M et al. J Cardiothorac Surg. 2012;7:26."]
+    },
+    {
+      "id": "belly-button-lint",
+      "year": 2002,
+      "category": "Interdisciplinary Research",
+      "laureates": "Karl Kruszelnicki",
+      "citation": "For his comprehensive survey of human belly button lint: who gets it, when, what colour, and how much.",
+      "hook": "A scientist ran a proper survey on belly button lint, with 5000 participants.",
+      "beats": [
+        "He wanted to know who gets it and why. The results were surprisingly consistent.",
+        "Lint is far more common in men, in older people, and in hairier people.",
+        "It's almost always blue-grey, no matter what colour clothes you wear."
+      ],
+      "twist": "The hair is the mechanism. Body hair acts as a one-way ratchet, its scales dragging clothing fibres inward toward the navel. Shaving around it makes the lint stop.",
+      "kicker": "A later researcher confirmed it by analysing his own lint daily for three years.",
+      "tags": ["body", "gross", "survey"],
+      "verified": "unverified",
+      "refs": ["Kruszelnicki K. Bellybutton lint survey. 2001. Steinhauser G. Med Hypotheses. 2009;72(6):623-5."]
+    },
+    {
+      "id": "scrotum-temperature",
+      "year": 2019,
+      "category": "Anatomy",
+      "laureates": "Roger Mieusset and Bourras Bengoudifa",
+      "citation": "For measuring scrotal temperature asymmetry in naked and clothed postmen in France.",
+      "hook": "French scientists measured the temperature of postmen's testicles. Individually.",
+      "beats": [
+        "There is a real medical question here. Sperm production is extremely temperature sensitive, and male fertility has been falling for decades.",
+        "The team recruited postal workers and measured each side separately, clothed and naked.",
+        "Ancient sculptors had already noticed an asymmetry and carved it into Greek statues."
+      ],
+      "twist": "The left side runs consistently warmer than the right when clothed. And modern clothing raises the temperature on both sides enough to matter for fertility.",
+      "kicker": "The Greek statues were anatomically correct. The science took 2000 years to catch up.",
+      "tags": ["medicine", "fertility", "anatomy"],
+      "verified": "unverified",
+      "refs": ["Bengoudifa B, Mieusset R. Hum Reprod. 2007;22(6):1509-15."]
+    },
+    {
+      "id": "alligator-helium",
+      "year": 2020,
+      "category": "Acoustics",
+      "laureates": "Stephan Reber and colleagues",
+      "citation": "For inducing a female Chinese alligator to bellow in an airtight chamber filled with helium-enriched air.",
+      "hook": "Scientists put an alligator in a helium chamber to hear what happened.",
+      "beats": [
+        "Helium changes the pitch of sound resonating in a chamber, which is why it makes your voice squeaky.",
+        "The question was whether alligators have vocal resonance like mammals and birds do, or whether they just make raw noise.",
+        "So they built a sealed chamber, filled it with helium and oxygen, and got a Chinese alligator to bellow inside it."
+      ],
+      "twist": "The bellow shifted pitch exactly as predicted. That means alligators do use vocal tract resonance, so this ability is at least 200 million years old, inherited from the ancestors of both crocodiles and birds.",
+      "kicker": "It also means we can estimate how dinosaurs sounded.",
+      "tags": ["animals", "evolution", "sound"],
+      "verified": "unverified",
+      "refs": ["Reber SA et al. J Exp Biol. 2015;218:2442-2447."]
+    },
+    {
+      "id": "heart-sync-dating",
+      "year": 2022,
+      "category": "Applied Cardiology",
+      "laureates": "Eliska Prochazkova and colleagues",
+      "citation": "For seeking and finding evidence that when new romantic partners meet for the first time, and feel attracted to each other, their heart rates synchronise.",
+      "hook": "Researchers can predict whether two people will fancy each other before they speak.",
+      "beats": [
+        "They built a real dating setup, wired participants with heart rate monitors and eye trackers, and let them meet through a screen that opened and closed.",
+        "Then they compared what people said they felt against what their bodies did.",
+        "Smiling, laughing and eye contact predicted nothing about actual attraction."
+      ],
+      "twist": "What predicted it was the body. Heart rates and pupil dilation syncing up between the two people. Conscious signals were useless. The unconscious ones were reliable.",
+      "kicker": "Chemistry is measurable, and you cannot fake it.",
+      "tags": ["psychology", "dating", "body"],
+      "verified": "unverified",
+      "refs": ["Prochazkova E et al. Nat Hum Behav. 2022;6:269-278."]
+    },
+    {
+      "id": "stanford-toilet",
+      "year": 2023,
+      "category": "Public Health",
+      "laureates": "Seung-min Park",
+      "citation": "For inventing the Stanford Toilet, a device that uses a variety of technologies to monitor what is deposited in it.",
+      "hook": "Stanford built a toilet that scans everything you leave in it.",
+      "beats": [
+        "It has motion sensing cameras, test strips for urine chemistry, and a computer vision system that classifies stool by medical standards.",
+        "The idea is genuine early disease detection. Your waste carries signals for cancers, diabetes and kidney disease long before symptoms show.",
+        "But it needs to know who is sitting on it."
+      ],
+      "twist": "So it identifies you biometrically. Partly by fingerprint on the flush lever, and partly by a camera that scans the distinctive pattern of your anus.",
+      "kicker": "The researchers call it an analprint. They say it is as unique as a fingerprint.",
+      "tags": ["technology", "medicine", "privacy"],
+      "verified": "unverified",
+      "refs": ["Park S et al. Nat Biomed Eng. 2020;4:624-635."]
+    },
+    {
+      "id": "liars-survey",
+      "year": 2016,
+      "category": "Psychology",
+      "laureates": "Evelyne Debey and colleagues",
+      "citation": "For asking a thousand liars how often they lie, and for deciding whether to believe those answers.",
+      "hook": "Scientists asked a thousand liars how often they lie, then had to decide whether to believe them.",
+      "beats": [
+        "They surveyed over a thousand people aged 6 to 77 about their daily lying.",
+        "Lying ability climbs through childhood, peaks in the teenage years, and declines steadily after that.",
+        "Teenagers are the best liars, and they lie the most."
+      ],
+      "twist": "The researchers openly admitted the core problem: the entire dataset depends on self-reported honesty from a group selected for lying. The paper discusses this paradox seriously.",
+      "kicker": "That honesty about their own limits is exactly why it's good science.",
+      "tags": ["psychology", "lying", "meta"],
+      "verified": "unverified",
+      "refs": ["Debey E et al. Acta Psychol. 2015;160:58-68."]
+    }
+  ]
+}
