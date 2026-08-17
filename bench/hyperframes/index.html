@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ig Nobel bench - HyperFrames</title>
+    <script src="node_modules/gsap/dist/gsap.min.js"></script>
+    <style>
+      html, body {
+        margin: 0; padding: 0;
+        width: 1080px; height: 1920px;
+        overflow: hidden; background: #0a0a0c;
+        font-family: "DejaVu Sans", sans-serif;
+      }
+      #main-composition { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+      .scene { position: absolute; inset: 0; overflow: hidden; }
+      .photo {
+        position: absolute; top: 50%; left: 50%;
+        width: 120%; height: 120%; object-fit: cover;
+        transform: translate(-50%, -50%); will-change: transform;
+      }
+      .vignette {
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 50% 40%, rgba(0,0,0,0) 30%, rgba(0,0,0,.75) 100%);
+      }
+      .lower-third {
+        position: absolute; left: 70px; bottom: 460px;
+        border-left: 10px solid #ffc700; padding-left: 34px; opacity: 0;
+      }
+      .kicker { color: #ffc700; font-size: 34px; font-weight: 700; letter-spacing: 2px; margin-bottom: 18px; }
+      .headline { color: #f7f6f2; font-size: 84px; font-weight: 700; line-height: 1.06; text-shadow: 0 6px 30px rgba(0,0,0,.6); }
+      .stat { position: absolute; left: 70px; bottom: 520px; width: 940px; }
+      .stat-number { color: #ffc700; font-size: 300px; font-weight: 700; line-height: .9; }
+      .stat-label { color: #f7f6f2; font-size: 36px; font-weight: 700; letter-spacing: 3px; margin: 24px 0 30px; }
+      .bar-track { height: 18px; background: rgba(255,255,255,.16); border-radius: 9px; }
+      .bar-fill { height: 100%; width: 0%; background: #ffc700; border-radius: 9px; }
+      .twist-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, #7a2418 0%, #2b0f0c 70%); }
+      .twist-text {
+        position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        text-align: center; color: #ff5c3c; font-size: 140px; font-weight: 700; line-height: 1.02;
+      }
+      .wipe { position: absolute; inset: 0; background: #ffc700; transform: translateX(-100%); }
+      .caption {
+        position: absolute; left: 0; right: 0; bottom: 300px; text-align: center;
+        color: #f7f6f2; font-size: 62px; font-weight: 700; text-shadow: 0 4px 18px rgba(0,0,0,.85);
+      }
+      .progress { position: absolute; left: 0; right: 0; bottom: 0; height: 10px; background: rgba(255,255,255,.14); }
+      .progress-fill { height: 100%; width: 0%; background: #ffc700; }
+    </style>
+  </head>
+  <body>
+    <div id="main-composition" data-composition-id="bench" data-start="0"
+         data-width="1080" data-height="1920" data-duration="8">
+
+      <!-- SCENE 1: archive photo, slow push-in, lower third slides in -->
+      <div class="clip scene" id="s1" data-start="0" data-duration="3.4" data-track-index="0">
+        <img class="photo" id="p1" src="assets/photo-a.jpg" alt="archive photo" />
+        <div class="vignette"></div>
+        <div class="lower-third" id="lt">
+          <div class="kicker">IG NOBEL &middot; REPRODUCTION &middot; 2016</div>
+          <div class="headline">He put polyester pants<br />on 75 rats</div>
+        </div>
+      </div>
+
+      <!-- SCENE 2: second photo, animated stat and bar -->
+      <div class="clip scene" id="s2" data-start="3.4" data-duration="2.8" data-track-index="0">
+        <img class="photo" id="p2" src="assets/photo-b.jpg" alt="archive photo" />
+        <div class="vignette"></div>
+        <div class="stat">
+          <div class="stat-number" id="count">0</div>
+          <div class="stat-label">RATS &middot; FIVE GROUPS &middot; TWELVE MONTHS</div>
+          <div class="bar-track"><div class="bar-fill" id="bar"></div></div>
+        </div>
+      </div>
+
+      <!-- SCENE 3: full-bleed twist card -->
+      <div class="clip scene" id="s3" data-start="6.2" data-duration="1.8" data-track-index="0">
+        <div class="twist-bg"></div>
+        <div class="twist-text" id="tw">STATIC<br />ELECTRICITY</div>
+      </div>
+
+      <!-- wipe transition, above the scenes -->
+      <div class="clip wipe" id="wipe" data-start="3.15" data-duration="0.5" data-track-index="1"></div>
+
+      <!-- persistent caption rail and progress bar -->
+      <div class="clip caption" id="cap" data-start="0" data-duration="8" data-track-index="2">
+        <span id="capword">seventy-five rats</span>
+      </div>
+      <div class="clip progress" id="prog" data-start="0" data-duration="8" data-track-index="3">
+        <div class="progress-fill" id="progfill"></div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const q = (id) => document.getElementById(id);
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+        window.__timelines["bench"] = tl;
+
+        // Scene 1 - slow push-in, lower third slides up then leaves.
+        tl.fromTo(q("p1"), { scale: 1.0 }, { scale: 1.16, duration: 3.4, ease: "none" }, 0);
+        tl.fromTo(q("lt"), { opacity: 0, y: 60 },
+          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.25);
+        tl.to(q("lt"), { opacity: 0, y: -40, duration: 0.35, ease: "power2.in" }, 2.95);
+
+        // Wipe transition.
+        tl.fromTo(q("wipe"), { xPercent: -100 },
+          { xPercent: 0, duration: 0.25, ease: "power2.in" }, 3.15);
+        tl.to(q("wipe"), { xPercent: 100, duration: 0.25, ease: "power2.out" }, 3.4);
+
+        // Scene 2 - pan, count up, grow the bar.
+        tl.fromTo(q("p2"), { scale: 1.18, xPercent: -3 },
+          { scale: 1.02, xPercent: 3, duration: 2.8, ease: "none" }, 3.4);
+        const counter = { v: 0 };
+        tl.to(counter, {
+          v: 75, duration: 1.1, ease: "power2.out",
+          onUpdate: () => { q("count").textContent = Math.round(counter.v); },
+        }, 3.7);
+        tl.fromTo(q("bar"), { width: "0%" },
+          { width: "100%", duration: 1.4, ease: "power2.out" }, 3.8);
+
+        // Scene 3 - twist card punches in.
+        tl.fromTo(q("tw"), { scale: 0.82, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.6)" }, 6.25);
+
+        // Persistent rail.
+        tl.fromTo(q("progfill"), { width: "0%" },
+          { width: "100%", duration: 8, ease: "none" }, 0);
+        const words = [
+          [0.0, "seventy-five rats"], [1.4, "five groups"], [2.4, "twelve months"],
+          [3.6, "cotton was fine"], [5.0, "polyester was not"], [6.3, "here is why"],
+        ];
+        words.forEach(([t, text]) => {
+          tl.call(() => { q("capword").textContent = text; }, null, t);
+        });
+      })();
+    </script>
+  </body>
+</html>

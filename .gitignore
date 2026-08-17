@@ -5,3 +5,7 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# benchmark scratch
+bench/**/node_modules/
+bench/**/out*.mp4

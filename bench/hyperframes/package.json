@@ -1,0 +1,14 @@
+{
+  "name": "ignobel",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.7.110 preview",
+    "check": "npx --yes hyperframes@0.7.110 check",
+    "render": "npx --yes hyperframes@0.7.110 render",
+    "publish": "npx --yes hyperframes@0.7.110 publish"
+  },
+  "dependencies": {
+    "gsap": "^3.15.0"
+  }
+}
