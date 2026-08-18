@@ -9,3 +9,7 @@ venv/
 # benchmark scratch
 bench/**/node_modules/
 bench/**/out*.mp4
+
+# local secrets and launcher output
+.env
+probe-resultat.txt

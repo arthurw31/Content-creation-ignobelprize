@@ -61,7 +61,7 @@ YCbCr Matrix: TV.709
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Caption,{theme.CAPTION_FONT_FAMILY},{theme.CAPTION_SIZE},{white},{white},{outline},{shadow},-1,0,0,0,100,100,2,0,1,{theme.CAPTION_OUTLINE},4,5,80,80,0,1
+Style: Caption,{theme.caption_font_family()},{theme.CAPTION_SIZE},{white},{white},{outline},{shadow},-1,0,0,0,100,100,2,0,1,{theme.CAPTION_OUTLINE},4,5,80,80,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text

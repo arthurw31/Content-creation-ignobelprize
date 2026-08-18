@@ -25,13 +25,21 @@ from .script_writer import PAUSE_AFTER, distribute_words
 
 
 def find_ffmpeg() -> str:
-    """Prefer a system ffmpeg, fall back to the npm ffmpeg-static binary."""
+    """Prefer a system ffmpeg, then the one imageio-ffmpeg ships."""
     env = os.environ.get("FFMPEG_BINARY")
     if env and Path(env).exists():
         return env
     found = shutil.which("ffmpeg")
     if found:
         return found
+    # imageio-ffmpeg ships a static binary for every platform, which is how
+    # start.py provisions FFmpeg without asking anyone to install it by hand.
+    try:
+        import imageio_ffmpeg
+
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        pass
     for candidate in [
         "/opt/node22/lib/node_modules/ffmpeg-static/ffmpeg",
         "/usr/local/lib/node_modules/ffmpeg-static/ffmpeg",
@@ -40,8 +48,18 @@ def find_ffmpeg() -> str:
         if Path(candidate).exists():
             return str(candidate)
     raise FileNotFoundError(
-        "ffmpeg not found. Install it, or set FFMPEG_BINARY to its path."
+        "ffmpeg not found. Run start.command / start.bat, install ffmpeg, "
+        "or set FFMPEG_BINARY to its path."
     )
+
+
+def _fontsdir() -> str:
+    """libass font directory as a filter argument, empty when there is none."""
+    directory = theme.fonts_dir()
+    if not directory:
+        return ""
+    escaped = directory.replace("\\", "/").replace(":", r"\:")
+    return f":fontsdir={escaped}"
 
 
 def run(cmd: list[str]) -> None:
@@ -173,7 +191,7 @@ def render(prize: Prize, script: VideoScript, out_dir: Path,
     ass_arg = str(ass_path.resolve()).replace("\\", "/").replace(":", r"\:")
     bar_h = 10
     video_chain = (
-        f"[0:v]subtitles='{ass_arg}':fontsdir=/usr/share/fonts,"
+        f"[0:v]subtitles='{ass_arg}'{_fontsdir()},"
         f"drawbox=x=0:y={theme.HEIGHT - bar_h}:w='iw*t/{duration:.3f}':"
         f"h={bar_h}:color={accent}@0.95:t=fill[v]"
     )

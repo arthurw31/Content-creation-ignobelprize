@@ -29,11 +29,28 @@ companies of 3 or fewer employees, commercial use included, paid above that.
 
 ## Install
 
+### The easy way (no terminal)
+
+1. Download the repository: green **Code** button on GitHub -> **Download ZIP**.
+2. Unzip it.
+3. Double-click **`start.bat`** (Windows) or **`start.command`** (Mac).
+
+That script checks Python, builds an isolated environment, installs FFmpeg,
+asks for your OpenRouter key, tests it, and offers to render. It spends
+nothing without asking.
+
+The only prerequisite is Python 3.10+. If it is missing the script says so and
+links the installer. On Windows, tick **"Add Python to PATH"** during that
+install.
+
+### The manual way
+
 ```bash
 pip install -r requirements.txt
 ```
 
-FFmpeg must be on `PATH`. If it isn't, point `FFMPEG_BINARY` at the binary:
+FFmpeg arrives with `imageio-ffmpeg`, so nothing extra is needed. To use your
+own build instead, point `FFMPEG_BINARY` at it:
 
 ```bash
 export FFMPEG_BINARY=/path/to/ffmpeg
@@ -87,6 +104,32 @@ python scripts/make_video.py --prize X --music bed.mp3        # add a music bed
 
 Roughly 2–3 minutes of render time per video on a modest CPU. Batch overnight.
 
+## AI-generated clips
+
+The typographic version above needs no keys and no network. The AI version
+replaces the cards with generated footage, via OpenRouter:
+
+```bash
+export OPENROUTER_API_KEY=sk-or-v1-...
+python -m pipeline.aiclip.openrouter --probe            # check the key first
+python scripts/make_ai_video.py --prize polyester-rats --dry-run
+python scripts/make_ai_video.py --prize polyester-rats --budget 8
+```
+
+Style coherence across a 30s video is enforced structurally, not by prompt
+luck. See `pipeline/aiclip/style.py` — one locked style suffix on every
+prompt, image-to-video rather than text-to-video, reference sheets for
+recurring subjects, one seed, and a single colour grade over all clips.
+
+Spending is gated. `--dry-run` generates nothing; `--budget` refuses to start
+above its cap; every intermediate is cached so a failed run resumes instead of
+paying twice.
+
+**Verify `openrouter.py` before trusting it.** openrouter.ai was unreachable
+from the machine it was written on, so the request shapes follow the
+documented conventions but were never run against the live API. `--probe`
+reports what the API actually returns and which fields need adjusting.
+
 ## The dataset
 
 `data/prizes.json` ships with 30 hand-written prizes. Each carries the source
@@ -125,9 +168,17 @@ pipeline/
   tts.py                  pluggable voiceover
   render.py               FFmpeg assembly
   publish.py              title, description, hashtags
+  aiclip/
+    style.py              the style bible — locked look, seed, subjects
+    plan.py               script -> shot list for the generative models
+    openrouter.py         video / image / speech client (run --probe first)
+    produce.py            sheets -> stills -> clips -> grade -> assembly
 scripts/
-  make_video.py           CLI
+  make_video.py           CLI, typographic version
+  make_ai_video.py        CLI, AI-clip version
+  start.py                all-in-one launcher used by start.bat/.command
   fetch_winners.py        dataset scraper
+start.bat / start.command double-click entry points
 out/                      rendered videos (gitignored)
 ```
 

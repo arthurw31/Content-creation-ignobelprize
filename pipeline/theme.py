@@ -48,8 +48,36 @@ FONT_CANDIDATES_REGULAR = [
     "C:/Windows/Fonts/arial.ttf",
 ]
 
-# libass looks fonts up by family name, not by path.
-CAPTION_FONT_FAMILY = "DejaVu Sans"
+# libass looks fonts up by family name, not by path, so the family has to be
+# one that actually exists on the machine doing the render. "DejaVu Sans" is
+# not installed on Windows, where the captions would silently fall back to
+# whatever libass picked instead.
+FONT_FAMILIES = [
+    ("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "DejaVu Sans"),
+    ("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", "Liberation Sans"),
+    ("C:/Windows/Fonts/arialbd.ttf", "Arial"),
+    ("C:/Windows/Fonts/segoeuib.ttf", "Segoe UI"),
+    ("/System/Library/Fonts/Supplemental/Arial Bold.ttf", "Arial"),
+    ("/Library/Fonts/Arial Bold.ttf", "Arial"),
+]
+
+
+def caption_font_family() -> str:
+    for path, family in FONT_FAMILIES:
+        if Path(path).exists():
+            return family
+    return "sans-serif"
+
+
+def fonts_dir() -> str | None:
+    """Directory to hand libass, or None to let it use the system config."""
+    for path, _ in FONT_FAMILIES:
+        if Path(path).exists():
+            return str(Path(path).parent)
+    return None
+
+
+CAPTION_FONT_FAMILY = caption_font_family()
 CAPTION_SIZE = 92
 CAPTION_OUTLINE = 6
 

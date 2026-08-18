@@ -22,7 +22,7 @@ from . import openrouter, style
 from .plan import plan_shots
 from .style import Shot, Subject
 from ..models import Prize, VideoScript
-from ..render import find_ffmpeg, run
+from ..render import _fontsdir, find_ffmpeg, run
 from .. import captions as captions_mod
 from .. import theme
 
@@ -190,7 +190,7 @@ def produce(prize: Prize, script: VideoScript, out_dir: Path,
         maps = ["-map", "0:v", "-map", "1:a"]
     else:
         maps = ["-map", "0:v"]
-    cmd += ["-vf", f"subtitles='{ass_arg}':fontsdir=/usr/share/fonts", *maps,
+    cmd += ["-vf", f"subtitles='{ass_arg}'{_fontsdir()}", *maps,
             "-c:v", "libx264", "-preset", "slow", "-crf", "20",
             "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
             "-movflags", "+faststart", "-shortest", str(final)]
