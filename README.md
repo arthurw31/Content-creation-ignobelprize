@@ -104,6 +104,37 @@ python scripts/make_video.py --prize X --music bed.mp3        # add a music bed
 
 Roughly 2–3 minutes of render time per video on a modest CPU. Batch overnight.
 
+## HyperFrames renderer
+
+The FFmpeg renderer above builds frames from filter graphs. The HyperFrames
+one builds them from HTML and a GSAP timeline, which is what makes real motion
+graphics practical — a count-up, a lower third, a wipe are elements being
+tweened rather than filter strings.
+
+```bash
+cd hyperframes && npm install && cd ..
+python scripts/make_hyperframes.py --prize polyester-rats           # write + lint
+python scripts/make_hyperframes.py --prize polyester-rats --check   # full QA
+python scripts/make_hyperframes.py --prize polyester-rats --render
+```
+
+`pipeline/hyperframes_build.py` generates the composition from the same script
+the FFmpeg path uses, so both renderers stay in sync with one source of truth.
+Layers: scenes, wipes, stat call-outs, word-by-word captions, progress bar —
+one track each, because the linter rejects overlapping clips on a track.
+
+Scenes use generated AI clips when `out/.ai-<prize>/graded/` holds them, and
+fall back to gradient cards when it does not, so the composition renders with
+or without the generative step.
+
+Note FFmpeg does not disappear here — HyperFrames shells out to it for
+encoding and refuses to start without `ffmpeg` and `ffprobe` on `PATH`.
+
+**Use `--check`, not your eyes.** It samples the timeline, measures layout
+geometry, and runs WCAG contrast on every text element. On this composition it
+caught a stat number sitting on top of its own label, and a role label
+colliding with the stat — both invisible in a still frame, both real.
+
 ## AI-generated clips
 
 The typographic version above needs no keys and no network. The AI version

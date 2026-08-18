@@ -13,3 +13,8 @@ bench/**/out*.mp4
 # local secrets and launcher output
 .env
 probe-resultat.txt
+
+# hyperframes project
+hyperframes/node_modules/
+hyperframes/assets/*.mp4
+hyperframes/out*.mp4
