@@ -114,7 +114,8 @@ def collect_clips(prize: Prize, count: int) -> list[str | None]:
 
 
 def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
-          voice_track: Path | None = None, shots: list | None = None) -> Path:
+          voice_track: Path | None = None, shots: list | None = None,
+          caption_y: dict[int, int] | None = None) -> Path:
     out_path = out_path or PROJECT / "index.html"
     duration = round(script.duration, 2)
     segments = script.segments
@@ -227,25 +228,65 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
             )
 
     # --- transitions --------------------------------------------------------
+    # One repeated wipe reads as a template. The cut style rotates instead,
+    # and the twist always gets the hardest one so the payoff lands.
+    KINDS = ["wipe-right", "cut", "wipe-up", "dip", "wipe-left", "cut"]
     for i in range(1, len(scene_specs)):
-        seg = _Scene(index=i, role=scene_specs[i]["role"], start=marks[i],
-                     duration=span[i])
-        tid = f"wp{seg.index}"
-        start = max(marks[seg.index] - 0.18, 0)
-        colour = ACCENT_ALT if seg.role == "twist" else ACCENT
+        role = scene_specs[i]["role"]
+        kind = "flash" if role == "twist" else KINDS[i % len(KINDS)]
+        if kind == "cut":
+            continue
+
+        tid = f"wp{i}"
+        start_at = max(marks[i] - 0.16, 0)
+        colour = ACCENT_ALT if role == "twist" else ACCENT
+        if kind == "dip":
+            colour = "#08080a"
+
         transitions.append(
-            f'<div class="clip wipe" id="{tid}" data-start="{start:.2f}" '
-            f'data-duration="0.36" data-track-index="1" '
+            f'<div class="clip wipe" id="{tid}" data-start="{start_at:.2f}" '
+            f'data-duration="0.34" data-track-index="1" '
+            f'data-transition="{kind}" '
             f'style="background:{colour}"></div>'
         )
-        tweens.append(
-            f'tl.fromTo(q("{tid}"), {{xPercent:-100}}, '
-            f'{{xPercent:0, duration:0.18, ease:"power2.in"}}, {start:.2f});'
-        )
-        tweens.append(
-            f'tl.to(q("{tid}"), {{xPercent:100, duration:0.18, '
-            f'ease:"power2.out"}}, {start + 0.18:.2f});'
-        )
+
+        if kind in ("wipe-right", "wipe-left"):
+            sign = 1 if kind == "wipe-right" else -1
+            tweens.append(
+                f'tl.fromTo(q("{tid}"), {{xPercent:{-100 * sign}, opacity:1}}, '
+                f'{{xPercent:0, duration:0.16, ease:"power2.in"}}, {start_at:.2f});'
+            )
+            tweens.append(
+                f'tl.to(q("{tid}"), {{xPercent:{100 * sign}, duration:0.16, '
+                f'ease:"power2.out"}}, {start_at + 0.16:.2f});'
+            )
+        elif kind == "wipe-up":
+            tweens.append(
+                f'tl.fromTo(q("{tid}"), {{yPercent:100, opacity:1}}, '
+                f'{{yPercent:0, duration:0.16, ease:"power2.in"}}, {start_at:.2f});'
+            )
+            tweens.append(
+                f'tl.to(q("{tid}"), {{yPercent:-100, duration:0.16, '
+                f'ease:"power2.out"}}, {start_at + 0.16:.2f});'
+            )
+        elif kind == "dip":
+            tweens.append(
+                f'tl.fromTo(q("{tid}"), {{opacity:0, xPercent:0}}, '
+                f'{{opacity:1, duration:0.16, ease:"power2.in"}}, {start_at:.2f});'
+            )
+            tweens.append(
+                f'tl.to(q("{tid}"), {{opacity:0, duration:0.18, '
+                f'ease:"power2.out"}}, {start_at + 0.16:.2f});'
+            )
+        else:  # flash
+            tweens.append(
+                f'tl.fromTo(q("{tid}"), {{opacity:0, xPercent:0}}, '
+                f'{{opacity:0.85, duration:0.07, ease:"none"}}, {start_at:.2f});'
+            )
+            tweens.append(
+                f'tl.to(q("{tid}"), {{opacity:0, duration:0.2, '
+                f'ease:"power2.out"}}, {start_at + 0.07:.2f});'
+            )
 
     # --- stat call-outs -----------------------------------------------------
     # This is the "motion graphics for the concepts and the numbers" layer:
@@ -285,6 +326,15 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
         )
 
     # --- captions -----------------------------------------------------------
+    caption_y = caption_y or {}
+
+    def scene_at(when: float) -> int:
+        """Which scene is on screen at this moment."""
+        for idx in range(len(scene_specs) - 1, -1, -1):
+            if when >= marks[idx]:
+                return idx
+        return 0
+
     caption_html: list[str] = []
     for ci, chunk in enumerate(chunk_words(script.words)):
         role = segments[chunk[0].segment_index].role
@@ -292,7 +342,12 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
         words = "".join(
             f'<span id="cw{ci}_{wi}">{esc(w.text)}</span> ' for wi, w in enumerate(chunk)
         )
-        caption_html.append(f'<div class="cap" id="cap{ci}">{words}</div>')
+        # Sit where this shot has the least going on, so the type never lands
+        # on the rat's face.
+        top = caption_y.get(scene_at(chunk[0].start), theme.CAPTION_Y)
+        caption_html.append(
+            f'<div class="cap" id="cap{ci}" style="top:{top}px">{words}</div>'
+        )
 
         start, end = chunk[0].start, chunk[-1].end
         tweens.append(
@@ -356,7 +411,7 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
         color:{ACCENT}; font-size:30px; letter-spacing:4px;
         border-bottom:3px solid {ACCENT}; padding-bottom:12px;
       }}
-      .wipe {{ position:absolute; inset:0; z-index:8; }}
+      .wipe {{ position:absolute; inset:0; z-index:8; opacity:0; }}
       .stat {{ position:absolute; left:70px; top:400px; width:940px; opacity:0; }}
       .stat-number {{ color:{ACCENT}; font-size:200px; font-weight:700; line-height:1.06; }}
       .stat-label {{ color:{CREAM}; font-size:34px; font-weight:700; letter-spacing:4px; margin:34px 0 26px; }}
@@ -364,7 +419,7 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
       .bar-fill {{ height:100%; width:0%; background:{ACCENT}; border-radius:8px; }}
       .caption-layer {{ position:absolute; inset:0; z-index:7; }}
       .cap {{
-        position:absolute; left:80px; right:80px; top:{theme.CAPTION_Y}px;
+        position:absolute; left:80px; right:80px;
         transform:translateY(-50%); text-align:center; opacity:0;
         color:{CREAM}; font-size:86px; font-weight:700; line-height:1.12;
         text-shadow:0 6px 22px rgba(0,0,0,.9);

@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from pipeline import render as ffrender, tts  # noqa: E402
+from pipeline import render as ffrender, subject_focus, tts  # noqa: E402
 from pipeline.aiclip.plan import describe, plan_shots  # noqa: E402
 from pipeline.hyperframes_build import PROJECT, build  # noqa: E402
 from pipeline.models import Prize, load_prize  # noqa: E402
@@ -98,7 +98,39 @@ def main() -> int:
     shots, _ = plan_shots(prize, script)
     if args.shots:
         print(describe(shots, {}))
-    path = build(prize, script, voice_track=voice_track, shots=shots)
+
+    # Measure where each shot's subject actually is, then keep the captions
+    # off it. A stat call-out already owns the upper band, so that candidate
+    # is blocked wherever one appears.
+    from pipeline.hyperframes_build import find_stat
+
+    work = ROOT / "out" / f".ai-{prize.id}"
+    media = {}
+    for shot in shots:
+        for folder, ext in (("graded", "mp4"), ("stills", "png")):
+            candidate = work / folder / f"shot{shot.index:02d}.{ext}"
+            if candidate.exists():
+                media[shot.index] = candidate
+                break
+
+    blocked = {}
+    for i, seg in enumerate(script.segments):
+        if seg.role in {"hook", "beat"} and find_stat(seg.text):
+            for shot in shots:
+                if seg.start <= shot.start < seg.end:
+                    blocked[shot.index] = {0.30}
+
+    placements = subject_focus.place_captions(
+        media, ffrender.find_ffmpeg(), ROOT / "out" / f".focus-{prize.id}",
+        blocked=blocked,
+    )
+    if args.shots:
+        print()
+        print(subject_focus.report(placements))
+    caption_y = {i: p.y for i, p in placements.items()}
+
+    path = build(prize, script, voice_track=voice_track, shots=shots,
+                 caption_y=caption_y)
     print(f"wrote {path.relative_to(ROOT)}  ({script.duration:.1f}s)")
 
     if hf("lint") != 0:
