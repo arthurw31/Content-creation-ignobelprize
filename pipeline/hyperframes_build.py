@@ -90,17 +90,24 @@ def esc(text: str) -> str:
 
 
 def collect_clips(prize: Prize, count: int) -> list[str | None]:
-    """Copy any generated AI clips into assets/ and return their paths."""
-    source = ROOT / "out" / f".ai-{prize.id}" / "graded"
+    """Copy generated media into assets/ and return per-shot paths.
+
+    A graded video clip wins when one exists. Otherwise a generated still is
+    used and the camera move carries the motion — which is the normal case
+    here, because OpenRouter serves no video model on this account.
+    """
+    base = ROOT / "out" / f".ai-{prize.id}"
     assets = PROJECT / "assets"
     assets.mkdir(parents=True, exist_ok=True)
     found: list[str | None] = []
     for i in range(count):
-        clip = source / f"shot{i:02d}.mp4"
-        if clip.exists():
-            dst = assets / f"{prize.id}-shot{i:02d}.mp4"
-            shutil.copy2(clip, dst)
-            found.append(f"assets/{dst.name}")
+        for folder, suffix in (("graded", "mp4"), ("stills", "png")):
+            src = base / folder / f"shot{i:02d}.{suffix}"
+            if src.exists():
+                dst = assets / f"{prize.id}-shot{i:02d}.{suffix}"
+                shutil.copy2(src, dst)
+                found.append(f"assets/{dst.name}")
+                break
         else:
             found.append(None)
     return found
@@ -137,6 +144,7 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
         )
 
     scenes: list[str] = []
+    labels: list[str] = []
     tweens: list[str] = []
     graphics: list[str] = []
     transitions: list[str] = []
@@ -156,16 +164,30 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
                      duration=span[i])
         sid = f"sc{seg.index}"
         clip = clips[seg.index]
-        if clip:
+        if clip and clip.endswith(".mp4"):
             media = (f'<video id="{sid}v" class="media" src="{clip}" muted '
                      f'playsinline></video>')
+        elif clip:
+            media = f'<img id="{sid}v" class="media" src="{clip}" alt="" data-layout-allow-overflow />'
         else:
             media = f'<div id="{sid}v" class="media gradient"></div>'
 
         label = ROLE_LABEL.get(seg.role, "") if seg.role != previous_role else ""
         previous_role = seg.role
-        label_html = (f'<div class="role-label" id="{sid}l">{esc(label)}</div>'
-                      if label else "")
+        label_html = ""
+        if label:
+            labels.append(
+                f'<div class="role-label" id="{sid}l">{esc(label)}</div>'
+            )
+            tweens.append(
+                f'tl.fromTo(q("{sid}l"), {{opacity:0, x:-30}}, '
+                f'{{opacity:1, x:0, duration:0.45, ease:"power3.out"}}, '
+                f'{marks[seg.index] + 0.1:.2f});'
+            )
+            tweens.append(
+                f'tl.to(q("{sid}l"), {{opacity:0, duration:0.3}}, '
+                f'{marks[seg.index] + span[seg.index] - 0.35:.2f});'
+            )
 
         scenes.append(
             f'<div class="clip scene" id="{sid}" data-start="{marks[seg.index]:.2f}" '
@@ -174,10 +196,16 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
             f'{media}{label_html}</div>'
         )
 
-        # A slow push-in on every scene, so nothing ever sits perfectly still.
+        # Stills have to carry the motion themselves, so every scene gets a
+        # slow move: alternating push-in and pull-back, with a small drift
+        # across it. A single repeated zoom direction reads as a slideshow.
+        zoom_in = seg.index % 2 == 0
+        z0, z1 = (1.04, 1.16) if zoom_in else (1.16, 1.04)
+        dx = 2.5 if seg.index % 4 in (0, 3) else -2.5
         tweens.append(
-            f'tl.fromTo(q("{sid}v"), {{scale:1.0}}, '
-            f'{{scale:1.12, duration:{span[seg.index]:.2f}, ease:"none"}}, '
+            f'tl.fromTo(q("{sid}v"), {{scale:{z0}, xPercent:{-dx}, yPercent:{dx / 2}}}, '
+            f'{{scale:{z1}, xPercent:{dx}, yPercent:{-dx / 2}, '
+            f'duration:{span[seg.index]:.2f}, ease:"none"}}, '
             f'{marks[seg.index]:.2f});'
         )
         if label:
@@ -289,13 +317,18 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
       html, body {{
         margin:0; padding:0; width:{theme.WIDTH}px; height:{theme.HEIGHT}px;
         overflow:hidden; background:#08080a;
-        font-family:"DejaVu Sans", Arial, Helvetica, sans-serif;
+        font-family:Inter, sans-serif;
       }}
       #main-composition {{ position:relative; width:{theme.WIDTH}px; height:{theme.HEIGHT}px; overflow:hidden; }}
       .scene {{ position:absolute; inset:0; overflow:hidden; }}
       .media {{
-        position:absolute; top:50%; left:50%; width:112%; height:112%;
-        object-fit:cover; transform:translate(-50%,-50%); will-change:transform;
+        /* No centring translate here on purpose. GSAP rewrites the whole
+           transform when it animates xPercent, which silently discarded a
+           translate(-50%,-50%) and threw the image into the corner. The
+           element already fills its parent, so scale and small percentage
+           offsets are all the camera move needs. */
+        position:absolute; top:0; left:0; width:100%; height:100%;
+        object-fit:cover; transform-origin:center center; will-change:transform;
       }}
       .gradient {{ background:var(--bg); }}
       .vignette {{
@@ -341,6 +374,7 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
       <div class="clip graphics-layer" id="gfx" data-start="0"
            data-duration="{duration}" data-track-index="2">
         <div class="vignette"></div>
+        {"".join(labels)}
         <div class="badge">{esc(prize.badge)}</div>
         {"".join(graphics)}
       </div>

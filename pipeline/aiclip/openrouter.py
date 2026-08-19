@@ -1,162 +1,114 @@
-"""OpenRouter client: video, image and speech generation.
+"""OpenRouter client: images and speech.
 
-IMPORTANT — verify before trusting this file.
+Every request shape here was verified against the live API on 2026-08-19 with
+a real key, not written from documentation. What that probe established:
 
-openrouter.ai is blocked by the network policy of the container this was
-written in, so the request shapes below could not be checked against the live
-API or its docs. They follow OpenRouter's documented conventions (OpenAI-
-compatible auth, /api/v1 base, async submit-and-poll for video), but treat
-them as a first draft.
-
-Run this before anything else, on a machine with network access:
-
-    python -m pipeline.aiclip.openrouter --probe
-
-It calls the cheap read-only endpoints, prints what the API actually returns,
-and tells you which of the shapes below need adjusting. Fix them once and the
-rest of the pipeline works.
-
-Never hard-code the key. Read it from OPENROUTER_API_KEY.
+* **No video models exist on this account.** The catalogue holds 415 models:
+  400 text, 11 image+text, 4 audio+text. No Veo, Sora, Seedance or Wan, and
+  `/api/v1/videos` returns 404. Generative *footage* is therefore not
+  available through OpenRouter here; `generate_video` raises rather than
+  pretending otherwise. Stills plus a camera move carry the picture instead.
+* **Images** come from `/chat/completions` with `modalities: ["image","text"]`,
+  and `image_config.aspect_ratio` is honoured — "9:16" returns 768x1344.
+  Roughly $0.039 per image on gemini-2.5-flash-image.
+* **Speech** is not on `/audio/speech`; every model name there 400s with
+  "does not exist". It works through `/chat/completions` on an audio-output
+  model, which refuses unless `stream: true`, and arrives as base64 PCM
+  chunks in the SSE deltas.
 """
 
 from __future__ import annotations
 
+import base64
 import json
 import os
-import time
 import urllib.error
 import urllib.request
-from dataclasses import dataclass
+import wave
 from pathlib import Path
+
+from .. import config  # noqa: F401  (loads .env on import)
 
 BASE = "https://openrouter.ai/api/v1"
 
-# Defaults chosen for cost, not maximum quality. A 30s video is 6 clips; at
-# premium-model prices that adds up fast. Move up once the format is proven.
-VIDEO_MODEL = os.environ.get("IGNOBEL_VIDEO_MODEL", "bytedance/seedance-2.0-fast")
 IMAGE_MODEL = os.environ.get("IGNOBEL_IMAGE_MODEL", "google/gemini-2.5-flash-image")
-TTS_MODEL = os.environ.get("IGNOBEL_TTS_MODEL", "openai/gpt-4o-mini-tts")
+TTS_MODEL = os.environ.get("IGNOBEL_TTS_MODEL", "openai/gpt-audio-mini")
 TTS_VOICE = os.environ.get("IGNOBEL_TTS_VOICE", "onyx")
 
-POLL_INTERVAL = 5.0
-POLL_TIMEOUT = 900.0
+# The audio deltas are 24kHz mono signed 16-bit little-endian.
+PCM_RATE = 24000
+PCM_WIDTH = 2
+
+NARRATION_STYLE = (
+    "Deadpan documentary narrator. Dry, confident, slightly amused. "
+    "Never jokey. Let the facts be the joke."
+)
 
 
 class OpenRouterError(RuntimeError):
     pass
 
 
+class VideoUnavailable(OpenRouterError):
+    """Raised because OpenRouter serves no video model on this account."""
+
+
 def _key() -> str:
     key = os.environ.get("OPENROUTER_API_KEY")
     if not key:
         raise OpenRouterError(
-            "OPENROUTER_API_KEY is not set.\n"
-            "  export OPENROUTER_API_KEY=sk-or-v1-...\n"
-            "Never paste the key into a file or a chat message."
+            "OPENROUTER_API_KEY is not set. Put it in the .env file at the "
+            "repo root, one line: OPENROUTER_API_KEY=sk-or-v1-..."
         )
     return key
 
 
-def _request(method: str, path: str, payload: dict | None = None,
-             raw: bool = False, timeout: float = 120) -> dict | bytes:
-    url = path if path.startswith("http") else f"{BASE}{path}"
-    data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(url, data=data, method=method, headers={
+def _headers() -> dict[str, str]:
+    return {
         "Authorization": f"Bearer {_key()}",
         "Content-Type": "application/json",
-        # OpenRouter uses these for attribution on your dashboard.
         "HTTP-Referer": "https://github.com/arthurw31/Content-creation-ignobelprize",
         "X-Title": "Ig Nobel video pipeline",
-    })
+    }
+
+
+def _post(path: str, payload: dict, timeout: float = 240) -> dict:
+    req = urllib.request.Request(f"{BASE}{path}", data=json.dumps(payload).encode(),
+                                 method="POST", headers=_headers())
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
-            body = resp.read()
+            return json.loads(resp.read())
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", "replace")[:600]
-        raise OpenRouterError(f"{method} {url} -> HTTP {exc.code}\n{detail}") from exc
-    return body if raw else json.loads(body)
+        raise OpenRouterError(f"POST {path} -> HTTP {exc.code}\n{detail}") from exc
+
+
+def _get(path: str, timeout: float = 60) -> dict:
+    req = urllib.request.Request(f"{BASE}{path}", headers=_headers())
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", "replace")[:600]
+        raise OpenRouterError(f"GET {path} -> HTTP {exc.code}\n{detail}") from exc
 
 
 # --- account ---------------------------------------------------------------
 
 def key_info() -> dict:
-    return _request("GET", "/key")
-
-
-def credits() -> dict:
-    return _request("GET", "/credits")
+    return _get("/key")
 
 
 def models() -> list[dict]:
-    return _request("GET", "/models").get("data", [])
+    return _get("/models").get("data", [])
 
 
-# --- video -----------------------------------------------------------------
-
-@dataclass
-class VideoJob:
-    id: str
-    status: str
-    url: str | None = None
-
-
-def submit_video(prompt: str, seconds: float, model: str = VIDEO_MODEL,
-                 reference_image: Path | str | None = None,
-                 negative_prompt: str | None = None,
-                 seed: int | None = None,
-                 aspect_ratio: str = "9:16") -> VideoJob:
-    """Submit a generation. Returns immediately with a job id.
-
-    `reference_image` switches this from text-to-video to image-to-video, which
-    is what actually holds style across shots. Pass one whenever you have one.
-    """
-    payload: dict = {
-        "model": model,
-        "prompt": prompt,
-        "duration": seconds,
-        "aspect_ratio": aspect_ratio,
-    }
-    if negative_prompt:
-        payload["negative_prompt"] = negative_prompt
-    if seed is not None:
-        payload["seed"] = seed
-    if reference_image:
-        payload["image"] = _as_data_uri(Path(reference_image))
-
-    data = _request("POST", "/videos", payload)
-    return VideoJob(
-        id=data.get("id") or data.get("generation_id", ""),
-        status=data.get("status", "queued"),
-        url=_extract_video_url(data),
-    )
-
-
-def poll_video(job: VideoJob, timeout: float = POLL_TIMEOUT) -> VideoJob:
-    deadline = time.time() + timeout
-    while time.time() < deadline:
-        if job.status in {"completed", "succeeded"} and job.url:
-            return job
-        if job.status in {"failed", "cancelled", "error"}:
-            raise OpenRouterError(f"Video job {job.id} ended as {job.status}")
-        time.sleep(POLL_INTERVAL)
-        data = _request("GET", f"/videos/{job.id}")
-        job.status = data.get("status", job.status)
-        job.url = _extract_video_url(data) or job.url
-    raise OpenRouterError(f"Video job {job.id} still {job.status} after {timeout:.0f}s")
-
-
-def generate_video(prompt: str, seconds: float, out_path: Path, **kwargs) -> Path:
-    job = poll_video(submit_video(prompt, seconds, **kwargs))
-    if not job.url:
-        raise OpenRouterError(f"Job {job.id} completed without a video URL")
-    return download(job.url, out_path)
-
-
-# --- image -----------------------------------------------------------------
+# --- images ----------------------------------------------------------------
 
 def generate_image(prompt: str, out_path: Path, model: str = IMAGE_MODEL,
-                   reference_image: Path | str | None = None) -> Path:
-    """Generate a still. Used for reference frames and character sheets."""
+                   reference_image: Path | str | None = None,
+                   aspect_ratio: str = "9:16") -> tuple[Path, float]:
+    """Generate one still. Returns its path and what it cost in USD."""
     content: list[dict] = [{"type": "text", "text": prompt}]
     if reference_image:
         content.append({
@@ -164,71 +116,117 @@ def generate_image(prompt: str, out_path: Path, model: str = IMAGE_MODEL,
             "image_url": {"url": _as_data_uri(Path(reference_image))},
         })
 
-    data = _request("POST", "/chat/completions", {
+    data = _post("/chat/completions", {
         "model": model,
-        "messages": [{"role": "user", "content": content}],
         "modalities": ["image", "text"],
+        "image_config": {"aspect_ratio": aspect_ratio},
+        "messages": [{"role": "user", "content": content}],
     })
 
     message = data["choices"][0]["message"]
     images = message.get("images") or []
     if not images:
+        refusal = message.get("refusal") or message.get("content") or ""
         raise OpenRouterError(
-            f"{model} returned no image. Response keys: {list(message)}"
+            f"{model} returned no image. refusal/content: {str(refusal)[:300]}"
         )
+
     url = images[0]["image_url"]["url"]
-    return _write_data_uri_or_download(url, out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    if url.startswith("data:"):
+        out_path.write_bytes(base64.b64decode(url.split(",", 1)[1]))
+    else:
+        download(url, out_path)
+    return out_path, float((data.get("usage") or {}).get("cost") or 0.0)
 
 
 # --- speech ----------------------------------------------------------------
 
 def generate_speech(text: str, out_path: Path, model: str = TTS_MODEL,
-                    voice: str = TTS_VOICE, instructions: str | None = None) -> Path:
-    payload: dict = {"model": model, "input": text, "voice": voice,
-                     "response_format": "mp3"}
-    if instructions:
-        payload["instructions"] = instructions
-    audio = _request("POST", "/audio/speech", payload, raw=True, timeout=180)
+                    voice: str = TTS_VOICE,
+                    instructions: str = NARRATION_STYLE) -> tuple[Path, float]:
+    """Synthesise narration to a WAV. Returns its path and cost in USD.
+
+    Audio-output models refuse a non-streaming request, so this reads the SSE
+    stream and concatenates the base64 PCM deltas.
+    """
+    payload = {
+        "model": model,
+        "stream": True,
+        "modalities": ["text", "audio"],
+        "audio": {"voice": voice, "format": "pcm16"},
+        "messages": [
+            {"role": "system", "content": instructions},
+            {"role": "user",
+             "content": f"Read this aloud exactly as written, and say nothing "
+                        f"else:\n\n{text}"},
+        ],
+    }
+    req = urllib.request.Request(f"{BASE}/chat/completions",
+                                 data=json.dumps(payload).encode(),
+                                 method="POST",
+                                 headers={**_headers(),
+                                          "Accept": "text/event-stream"})
+
+    chunks: list[bytes] = []
+    cost = 0.0
+    try:
+        with urllib.request.urlopen(req, timeout=300) as resp:
+            for raw in resp:
+                line = raw.decode("utf-8", "replace").strip()
+                if not line.startswith("data:"):
+                    continue
+                body = line[5:].strip()
+                if body == "[DONE]":
+                    break
+                try:
+                    event = json.loads(body)
+                except json.JSONDecodeError:
+                    continue
+                usage = event.get("usage")
+                if usage and usage.get("cost"):
+                    cost = float(usage["cost"])
+                for choice in event.get("choices", []):
+                    audio = (choice.get("delta") or {}).get("audio")
+                    if isinstance(audio, dict) and audio.get("data"):
+                        chunks.append(base64.b64decode(audio["data"]))
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", "replace")[:600]
+        raise OpenRouterError(f"speech -> HTTP {exc.code}\n{detail}") from exc
+
+    if not chunks:
+        raise OpenRouterError(f"{model} returned no audio for {text[:60]!r}")
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_bytes(audio)  # type: ignore[arg-type]
-    return out_path
+    with wave.open(str(out_path), "wb") as handle:
+        handle.setnchannels(1)
+        handle.setsampwidth(PCM_WIDTH)
+        handle.setframerate(PCM_RATE)
+        handle.writeframes(b"".join(chunks))
+    return out_path, cost
+
+
+# --- video (not available here) --------------------------------------------
+
+def generate_video(*_args, **_kwargs):
+    raise VideoUnavailable(
+        "OpenRouter serves no video-generation model on this account: the "
+        "catalogue has 400 text, 11 image and 4 audio models, and there is no "
+        "/videos endpoint. Use generate_image and animate the still, or bring "
+        "a dedicated video provider (fal.ai, Replicate, Higgsfield)."
+    )
+
+
+submit_video = generate_video
 
 
 # --- helpers ---------------------------------------------------------------
 
-def _extract_video_url(data: dict) -> str | None:
-    for key in ("url", "video_url", "output_url"):
-        if isinstance(data.get(key), str):
-            return data[key]
-    for key in ("output", "data", "videos"):
-        value = data.get(key)
-        if isinstance(value, list) and value:
-            first = value[0]
-            if isinstance(first, str):
-                return first
-            if isinstance(first, dict):
-                for inner in ("url", "video_url"):
-                    if isinstance(first.get(inner), str):
-                        return first[inner]
-    return None
-
-
 def _as_data_uri(path: Path) -> str:
-    import base64
     import mimetypes
 
     mime = mimetypes.guess_type(path.name)[0] or "image/png"
     return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode()}"
-
-
-def _write_data_uri_or_download(url: str, out_path: Path) -> Path:
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    if url.startswith("data:"):
-        import base64
-
-        out_path.write_bytes(base64.b64decode(url.split(",", 1)[1]))
-        return out_path
-    return download(url, out_path)
 
 
 def download(url: str, out_path: Path) -> Path:
@@ -241,47 +239,35 @@ def download(url: str, out_path: Path) -> Path:
 # --- probe -----------------------------------------------------------------
 
 def probe() -> int:
-    """Check auth and report which models this key can actually reach."""
     print("Checking OPENROUTER_API_KEY ...")
     try:
-        info = key_info()
+        info = key_info().get("data", {})
     except OpenRouterError as exc:
         print(f"  FAILED\n{exc}")
         return 1
-    print(f"  ok: {json.dumps(info, indent=2)[:400]}")
+    limit = info.get("limit")
+    remaining = info.get("limit_remaining")
+    print(f"  ok — credit limit ${limit}, remaining ${remaining}, "
+          f"used ${info.get('usage')}")
 
-    print("\nLooking for video / image / speech models ...")
-    try:
-        catalogue = models()
-    except OpenRouterError as exc:
-        print(f"  could not list models: {exc}")
-        return 1
+    catalogue = models()
+    by_output: dict[str, list[str]] = {"video": [], "image": [], "audio": []}
+    for m in catalogue:
+        for kind in (m.get("architecture") or {}).get("output_modalities") or []:
+            by_output.setdefault(kind, []).append(m["id"])
 
-    def by_output(kind: str) -> list[str]:
-        found = []
-        for m in catalogue:
-            arch = m.get("architecture") or {}
-            if kind in (arch.get("output_modalities") or []):
-                found.append(m["id"])
-        return found
-
+    print(f"\n{len(catalogue)} models visible")
     for kind in ("video", "image", "audio"):
-        ids = by_output(kind)
-        print(f"  {kind:6s}: {len(ids)} models")
-        for model_id in ids[:8]:
-            print(f"          {model_id}")
+        print(f"  {kind:6s}: {len(by_output.get(kind, []))}")
 
-    for label, configured in (("video", VIDEO_MODEL), ("image", IMAGE_MODEL),
-                              ("speech", TTS_MODEL)):
-        known = {m["id"] for m in catalogue}
-        mark = "ok" if configured in known else "NOT IN CATALOGUE - change it"
-        print(f"\nconfigured {label} model: {configured}  [{mark}]")
+    if not by_output.get("video"):
+        print("\n  No video model. Footage must come from stills plus a "
+              "camera move, or from another provider.")
 
-    print(
-        "\nIf a call later fails with HTTP 400, compare the error against the "
-        "payloads in submit_video / generate_image / generate_speech and adjust "
-        "the field names. They were written without access to the live docs."
-    )
+    known = {m["id"] for m in catalogue}
+    for label, configured in (("image", IMAGE_MODEL), ("speech", TTS_MODEL)):
+        mark = "ok" if configured in known else "NOT IN CATALOGUE"
+        print(f"  configured {label}: {configured} [{mark}]")
     return 0
 
 

@@ -20,3 +20,6 @@ hyperframes/assets/*.mp4
 hyperframes/assets/*.wav
 hyperframes/assets/*.mp3
 hyperframes/out*.mp4
+
+# generated stills copied in for the composition
+hyperframes/assets/*.png

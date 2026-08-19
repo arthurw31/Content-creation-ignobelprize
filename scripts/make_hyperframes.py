@@ -11,6 +11,8 @@ which is the fast loop while you are shaping a video.
 from __future__ import annotations
 
 import argparse
+import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -56,8 +58,22 @@ def build_voice(prize: Prize, script, provider: str) -> Path | None:
     return track
 
 
+def npx() -> str:
+    """Resolve npx properly. On Windows it is npx.cmd, and subprocess without
+    a shell will not find the bare name."""
+    # On Windows the extensionless "npx" is a shell script that CreateProcess
+    # rejects with WinError 193; the .cmd shim is the runnable one.
+    names = ["npx.cmd", "npx"] if os.name == "nt" else ["npx"]
+    found = next((shutil.which(n) for n in names if shutil.which(n)), None)
+    if not found:
+        raise FileNotFoundError(
+            "npx not found. Install Node.js and reopen the terminal."
+        )
+    return found
+
+
 def hf(*args: str) -> int:
-    return subprocess.run(["npx", "--yes", "hyperframes@0.7.110", *args],
+    return subprocess.run([npx(), "--yes", "hyperframes@0.7.110", *args],
                           cwd=PROJECT).returncode
 
 

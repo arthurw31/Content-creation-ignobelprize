@@ -1,4 +1,4 @@
-"""Voiceover generation, with a provider you can swap without touching render.
+﻿"""Voiceover generation, with a provider you can swap without touching render.
 
 Providers:
     none        - silent track, captions carry the video (works offline)
@@ -22,6 +22,7 @@ import subprocess
 import wave
 from pathlib import Path
 
+from . import config  # noqa: F401  (loads .env on import)
 from .models import Segment
 
 OPENAI_VOICE = os.environ.get("IGNOBEL_OPENAI_VOICE", "onyx")
@@ -106,30 +107,16 @@ def _openai(text: str, out_path: Path) -> None:
 
 
 def _openrouter(text: str, out_path: Path) -> None:
-    """Same request shape as OpenAI's, which is what OpenRouter mirrors."""
-    import json
-    import urllib.request
+    """Delegate to the verified client, which writes a WAV directly.
 
-    key = os.environ.get("OPENROUTER_API_KEY")
-    if not key:
-        raise TTSUnavailable("OPENROUTER_API_KEY is not set")
+    OpenRouter's /audio/speech endpoint rejects every model name on this
+    account; speech only comes back as PCM deltas over a streamed chat
+    completion. That logic lives in aiclip.openrouter, so it is not
+    duplicated here.
+    """
+    from .aiclip.openrouter import generate_speech
 
-    payload = json.dumps({
-        "model": os.environ.get("IGNOBEL_OR_TTS_MODEL", "openai/gpt-4o-mini-tts"),
-        "voice": OPENAI_VOICE,
-        "input": text,
-        "instructions": NARRATION_STYLE,
-        "response_format": "mp3",
-    }).encode()
-
-    req = urllib.request.Request(
-        "https://openrouter.ai/api/v1/audio/speech",
-        data=payload,
-        headers={"Authorization": f"Bearer {key}",
-                 "Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(req, timeout=180) as resp:
-        out_path.write_bytes(resp.read())
+    generate_speech(text, out_path, instructions=NARRATION_STYLE)
 
 
 def _elevenlabs(text: str, out_path: Path) -> None:
@@ -166,3 +153,5 @@ def _to_wav(src: Path, dst: Path, ffmpeg: str) -> None:
 def wav_duration(path: Path) -> float:
     with wave.open(str(path), "rb") as handle:
         return handle.getnframes() / float(handle.getframerate())
+
+
