@@ -36,79 +36,76 @@ MIN_SHOT_SECONDS = 1.4
 # Hand-written shot lists, keyed by prize. `cue` is the phrase in the
 # narration that the shot illustrates; timing comes from when it is spoken.
 HANDWRITTEN: dict[str, list[dict]] = {
+    # "asset" is a stable name for the generated media, so the edit can be
+    # reordered without regenerating anything: files live under
+    # out/.ai-<prize>/{stills,graded}/<asset>.{png,mp4}, not under a position.
+    # "cue" is the phrase the shot illustrates; its start comes from when
+    # those words are actually spoken.
     "polyester-rats": [
-        # No person in frame. Seedance rejects a first frame it thinks holds a
-        # real person ("InputImageSensitiveContentDetected.PrivacyInformation"),
-        # so shots that would show the researcher are staged around him.
-        {"cue": "A scientist put",
-         "still": "A white laboratory rat inside a wire cage on a cluttered "
-                  "1970s laboratory bench, looking out through the bars, warm "
-                  "lamp light raking across the wire",
-         "action": "The rat sniffs at the bars and turns its head. The camera "
-                   "pushes in very slowly",
-         "subjects": ["lab"]},
-        {"cue": "tiny polyester pants",
-         "still": "Extreme close-up of tiny tailored trousers made of shiny "
-                  "synthetic fabric being pulled onto the hind legs of a "
-                  "white rat, clinical overhead light",
-         "action": "Fingers ease the fabric up over the hind legs. The rat "
-                   "shifts its weight",
+        # The most absurd image in the whole story is the first frame. Opening
+        # on an establishing shot wastes the only second that decides whether
+        # anyone stays.
+        {"cue": "Tiny polyester trousers", "asset": "trousers",
+         "still": "Extreme close-up of tiny tailored trousers of shiny "
+                  "synthetic fabric on the hind legs of a white laboratory rat",
+         "action": "The rat shifts its weight. Very slow push-in",
          "subjects": []},
-        {"cue": "on 75 rats",
+        {"cue": "seventy-five rats", "asset": "cages-rows",
          "still": "Overhead view of many wire cages in rows on a laboratory "
-                  "rack, a white rat in each, numbered cards clipped to the "
-                  "front",
-         "action": "The camera rises slowly, revealing more rows of cages",
+                  "rack, a white rat in each",
+         "action": "The camera rises slowly over the rows of cages",
          "subjects": ["lab"]},
-        {"cue": "into five groups",
-         "still": "Five glass tanks in a row on a bench, each with a "
-                  "handwritten label card, one rat visible in each",
-         "action": "The camera drifts along the row, left to right",
-         "subjects": ["lab"]},
-        {"cue": "Polyester, poly-cotton",
-         "still": "Four fabric swatches laid side by side on a dark bench, "
-                  "labelled in typewriter text, raking side light showing "
-                  "the weave of each",
+        {"cue": "destroyed their sex life", "asset": "still-rat",
+         "still": "A single white rat in tiny synthetic trousers sitting "
+                  "motionless in the corner of a tank, cold light",
+         "action": "The rat stays completely still. The camera creeps in",
+         "subjects": []},
+        {"cue": "tailored them himself", "asset": "swatches",
+         "still": "Four fabric swatches side by side on a dark bench, raking "
+                  "side light showing the weave",
          "action": "The camera pushes in slowly across the swatches",
          "subjects": []},
-        {"cue": "Then he waited",
+        {"cue": "Five groups", "asset": "five-tanks",
+         "still": "Five glass tanks in a row on a bench, each with a "
+                  "handwritten label card",
+         "action": "The camera drifts along the row, left to right",
+         "subjects": ["lab"]},
+        {"cue": "left naked", "asset": "cage",
+         "still": "A white laboratory rat inside a wire cage on a cluttered "
+                  "1970s laboratory bench, looking out through the bars",
+         "action": "The rat sniffs at the bars and turns its head",
+         "subjects": ["lab"]},
+        {"cue": "waited a full year", "asset": "calendar",
          "still": "A wall calendar in a laboratory, months crossed off in "
-                  "pen, harsh side light, dust drifting in the beam",
+                  "pen, dust drifting in a hard side light",
          "action": "Dust drifts through the light. The camera holds still",
          "subjects": ["lab"]},
-        {"cue": "measuring how often",
-         "still": "Close-up of a researcher's hand adding tally marks to a "
-                  "column in a paper notebook, pen and page in sharp focus",
+        {"cue": "counting how often", "asset": "notebook",
+         "still": "Close-up of a hand adding tally marks to a column in a "
+                  "paper notebook",
          "action": "The hand adds two marks, then pauses",
          "subjects": ["scientist"]},
-        {"cue": "The cotton and wool",
+        {"cue": "Cotton and wool", "asset": "two-rats",
          "still": "Two lively white rats moving around a clean tank with "
                   "wood shavings, warm soft light",
          "action": "The rats move about, sniffing and turning",
          "subjects": ["lab"]},
-        {"cue": "The polyester rats stopped",
-         "still": "A single white rat in tiny synthetic trousers sitting "
-                   "motionless in the corner of a tank, cold light, deep "
-                   "shadow around it",
-         "action": "The rat stays completely still. The camera creeps in",
-         "subjects": []},
-        {"cue": "generating static electricity",
-         "still": "Macro shot of synthetic fabric fibres lit from the side, "
-                  "tiny blue static sparks arcing between the threads, black "
-                  "background",
-         "action": "Sparks flicker across the fibres. The camera pushes in",
-         "subjects": []},
-        {"cue": "out of the mood",
-         "still": "A rat seen through the glass of a tank, lit from one side, "
-                  "faint blue electrical glow reflected on the glass",
+        {"cue": "almost completely stopped", "asset": "glow",
+         "still": "A rat seen through the glass of a tank, lit from one "
+                  "side, faint blue electrical glow on the glass",
          "action": "The glow pulses faintly. The rat does not move",
          "subjects": []},
-        {"cue": "Take the pants off",
+        {"cue": "generating static electricity", "asset": "fibres",
+         "still": "Macro shot of synthetic fabric fibres lit from the side, "
+                  "tiny blue static sparks arcing between the threads",
+         "action": "Sparks flicker across the fibres. The camera pushes in",
+         "subjects": []},
+        {"cue": "Take the trousers off", "asset": "free-rat",
          "still": "A white rat with no trousers, grooming itself in a clean "
                   "tank, warm light, shot from slightly below",
          "action": "The rat grooms its face, then settles",
          "subjects": ["lab"]},
-        {"cue": "published in European",
+        {"cue": "Ig Nobel Prize", "asset": "journal",
          "still": "An open academic journal page on a desk under a lamp, "
                   "dense typeset columns, a diagram in the margin",
          "action": "The camera drifts down the printed column",
@@ -173,6 +170,7 @@ def plan_shots(prize: Prize, script: VideoScript) -> tuple[list[Shot], dict[str,
             action=spec["action"],
             subjects=spec.get("subjects", []),
             role=_role_at(script, start),
+            asset=spec.get("asset"),
         ))
         shots[-1].start = start
 

@@ -25,15 +25,19 @@
       "category": "Reproduction",
       "laureates": "Ahmed Shafik",
       "citation": "For testing the effects of wearing polyester, cotton, or wool trousers on the sex life of rats.",
-      "hook": "A scientist put tiny polyester pants on 75 rats.",
+      "hook": "Tiny polyester trousers. On seventy-five rats. And it destroyed their sex life.",
       "beats": [
-        "He split them into five groups. Polyester, poly-cotton, pure cotton, pure wool, and one group left naked.",
-        "Then he waited a full year, measuring how often each group mated.",
-        "The cotton and wool rats were fine. The polyester rats stopped having sex almost entirely."
+        "A surgeon in Cairo tailored them himself. Five groups: polyester, poly-cotton, pure cotton, pure wool, and one group left naked.",
+        "Then he waited a full year, counting how often each group mated.",
+        "Cotton and wool, no change at all. The polyester rats almost completely stopped."
       ],
-      "twist": "The polyester was generating static electricity across their bodies. The fabric was literally electrifying them out of the mood.",
-      "kicker": "Take the pants off, and six months later they were back to normal. It was published in European Urology.",
-      "tags": ["animals", "sex", "materials"],
+      "twist": "The fabric was generating static electricity across their bodies. They were being quietly electrified out of the mood.",
+      "kicker": "Take the trousers off, six months later, back to normal. It won an Ig Nobel Prize. Now go and check what your underwear is made of.",
+      "tags": [
+        "animals",
+        "sex",
+        "materials"
+      ],
       "verified": "pubmed",
       "refs": [
         "Shafik A. Effect of different types of textiles on sexual activity. Experimental study. Eur Urol. 1993;24(3):375-80. PMID 8262106. DOI 10.1159/000474332"
@@ -53,9 +57,15 @@
       ],
       "twist": "Ten years later, that same scientist, Andre Geim, won an actual Nobel Prize in Physics for discovering graphene.",
       "kicker": "He is the only person alive holding both a Nobel and an Ig Nobel.",
-      "tags": ["physics", "animals", "famous"],
+      "tags": [
+        "physics",
+        "animals",
+        "famous"
+      ],
       "verified": "unverified",
-      "refs": ["Berry MV, Geim AK. Of flying frogs and levitrons. Eur J Phys. 1997;18:307."]
+      "refs": [
+        "Berry MV, Geim AK. Of flying frogs and levitrons. Eur J Phys. 1997;18:307."
+      ]
     },
     {
       "id": "cheese-mosquitoes",
@@ -71,9 +81,15 @@
       ],
       "twist": "The finding got used for real. Limburger cheese has been deployed as bait in mosquito traps in Africa.",
       "kicker": "A cheese joke became a malaria control tool.",
-      "tags": ["biology", "disease", "food"],
+      "tags": [
+        "biology",
+        "disease",
+        "food"
+      ],
       "verified": "unverified",
-      "refs": ["De Jong R, Knols BGJ. Limburger cheese as an attractant for the malaria mosquito. Lancet. 1995."]
+      "refs": [
+        "De Jong R, Knols BGJ. Limburger cheese as an attractant for the malaria mosquito. Lancet. 1995."
+      ]
     },
     {
       "id": "dead-salmon-fmri",
@@ -89,9 +105,15 @@
       ],
       "twist": "It was never about the fish. They were proving that standard brain-scan statistics produce fake results if you don't correct them properly.",
       "kicker": "The dead salmon changed how neuroscience papers are reviewed. It is one of the most cited jokes in science.",
-      "tags": ["neuroscience", "statistics", "methods"],
+      "tags": [
+        "neuroscience",
+        "statistics",
+        "methods"
+      ],
       "verified": "unverified",
-      "refs": ["Bennett CM et al. Neural correlates of interspecies perspective taking in the post-mortem Atlantic salmon. 2009."]
+      "refs": [
+        "Bennett CM et al. Neural correlates of interspecies perspective taking in the post-mortem Atlantic salmon. 2009."
+      ]
     },
     {
       "id": "upside-down-rhinos",
@@ -107,9 +129,15 @@
       ],
       "twist": "Upside down was better. The inverted rhinos had measurably better oxygen levels than the ones lying on their side.",
       "kicker": "That result is now standard practice in rhino conservation.",
-      "tags": ["animals", "conservation", "medicine"],
+      "tags": [
+        "animals",
+        "conservation",
+        "medicine"
+      ],
       "verified": "unverified",
-      "refs": ["Radcliffe RW et al. J Wildl Dis. 2021."]
+      "refs": [
+        "Radcliffe RW et al. J Wildl Dis. 2021."
+      ]
     },
     {
       "id": "wombat-cubes",
@@ -125,9 +153,15 @@
       ],
       "twist": "The last section of the gut has stiff and soft regions alternating around the ring. As waste is squeezed through, the soft parts stretch and the stiff parts form the corners.",
       "kicker": "Engineers are now studying it as a new way to manufacture cubes without cutting or moulding.",
-      "tags": ["animals", "engineering", "gross"],
+      "tags": [
+        "animals",
+        "engineering",
+        "gross"
+      ],
       "verified": "unverified",
-      "refs": ["Yang PJ et al. Soft Matter. 2021."]
+      "refs": [
+        "Yang PJ et al. Soft Matter. 2021."
+      ]
     },
     {
       "id": "cats-liquid",
@@ -143,9 +177,15 @@
       ],
       "twist": "The answer is that it depends on the timescale. On short timescales a cat is a solid. Give it enough time in a box, and it is genuinely a liquid.",
       "kicker": "The paper is a real fluid dynamics lesson, wrapped in a cat joke.",
-      "tags": ["physics", "animals", "maths"],
+      "tags": [
+        "physics",
+        "animals",
+        "maths"
+      ],
       "verified": "unverified",
-      "refs": ["Fardin MA. Rheol Bull. 2014;83:16-17."]
+      "refs": [
+        "Fardin MA. Rheol Bull. 2014;83:16-17."
+      ]
     },
     {
       "id": "coffee-walking-backwards",
@@ -161,9 +201,15 @@
       ],
       "twist": "Walking backwards works. It disrupts the resonance and dramatically cuts spilling. So does holding the cup by the rim from above, instead of by the handle.",
       "kicker": "He was an undergraduate when he did this. It won him an Ig Nobel.",
-      "tags": ["physics", "everyday", "useful"],
+      "tags": [
+        "physics",
+        "everyday",
+        "useful"
+      ],
       "verified": "unverified",
-      "refs": ["Han J. Achievements in the Life Sciences. 2016."]
+      "refs": [
+        "Han J. Achievements in the Life Sciences. 2016."
+      ]
     },
     {
       "id": "sword-swallowing",
@@ -179,9 +225,15 @@
       ],
       "twist": "The most dangerous variant reported wasn't a bigger sword. It was a curved sabre, and one performer was injured while being distracted by a macaw on his shoulder.",
       "kicker": "It was published in the British Medical Journal, and it is genuinely useful to emergency doctors.",
-      "tags": ["medicine", "performers", "injury"],
+      "tags": [
+        "medicine",
+        "performers",
+        "injury"
+      ],
       "verified": "unverified",
-      "refs": ["Witcombe B, Meyer D. BMJ. 2006;333:1285-7."]
+      "refs": [
+        "Witcombe B, Meyer D. BMJ. 2006;333:1285-7."
+      ]
     },
     {
       "id": "rollercoaster-kidney-stones",
@@ -197,9 +249,15 @@
       ],
       "twist": "It worked. Sitting in the back of the ride passed stones about 64 percent of the time. Sitting at the front dropped it to 17 percent.",
       "kicker": "The ride was Big Thunder Mountain at Disney World.",
-      "tags": ["medicine", "weird-method", "useful"],
+      "tags": [
+        "medicine",
+        "weird-method",
+        "useful"
+      ],
       "verified": "unverified",
-      "refs": ["Mitchell MA, Wartinger DD. J Am Osteopath Assoc. 2016;116(10):647-652."]
+      "refs": [
+        "Mitchell MA, Wartinger DD. J Am Osteopath Assoc. 2016;116(10):647-652."
+      ]
     },
     {
       "id": "bee-sting-map",
@@ -215,9 +273,15 @@
       ],
       "twist": "The worst three, in order, were the nostril, the upper lip, and the penis shaft. The nostril was so bad it caused violent sneezing and streaming eyes.",
       "kicker": "He is now a real bee researcher, and this is his most cited paper.",
-      "tags": ["pain", "insects", "self-experiment"],
+      "tags": [
+        "pain",
+        "insects",
+        "self-experiment"
+      ],
       "verified": "unverified",
-      "refs": ["Smith ML. PeerJ. 2014;2:e338."]
+      "refs": [
+        "Smith ML. PeerJ. 2014;2:e338."
+      ]
     },
     {
       "id": "slime-mould-maze",
@@ -233,9 +297,15 @@
       ],
       "twist": "Later they laid out oat flakes matching the cities around Tokyo. The slime mould built a network almost identical to the actual Tokyo rail system, which took human engineers decades to design.",
       "kicker": "No brain required.",
-      "tags": ["biology", "intelligence", "networks"],
+      "tags": [
+        "biology",
+        "intelligence",
+        "networks"
+      ],
       "verified": "unverified",
-      "refs": ["Nakagaki T et al. Nature. 2000;407:470. Tero A et al. Science. 2010;327:439-442."]
+      "refs": [
+        "Nakagaki T et al. Nature. 2000;407:470. Tero A et al. Science. 2010;327:439-442."
+      ]
     },
     {
       "id": "duck-necrophilia",
@@ -251,9 +321,15 @@
       ],
       "twist": "It was the first recorded case of homosexual necrophilia in this species, and it went into the scientific literature.",
       "kicker": "The museum now marks the anniversary every year. There is a plaque.",
-      "tags": ["animals", "dark", "museum"],
+      "tags": [
+        "animals",
+        "dark",
+        "museum"
+      ],
       "verified": "unverified",
-      "refs": ["Moeliker CW. Deinsea. 2001;8:243-247."]
+      "refs": [
+        "Moeliker CW. Deinsea. 2001;8:243-247."
+      ]
     },
     {
       "id": "banana-peel-friction",
@@ -269,9 +345,15 @@
       ],
       "twist": "That makes it about six times more slippery, comparable to a well-lubricated joint. The cause is the peel's inner surface, where crushed cells release a gel.",
       "kicker": "The cartoon was right. The research came from a group studying artificial joints.",
-      "tags": ["physics", "comedy", "everyday"],
+      "tags": [
+        "physics",
+        "comedy",
+        "everyday"
+      ],
       "verified": "unverified",
-      "refs": ["Mabuchi K et al. Tribology Online. 2012;7(3):147-151."]
+      "refs": [
+        "Mabuchi K et al. Tribology Online. 2012;7(3):147-151."
+      ]
     },
     {
       "id": "penguin-poo-pressure",
@@ -287,9 +369,15 @@
       ],
       "twist": "About 60 kilopascals. That is roughly four times the pressure a human generates, and comparable to the pressure inside a car tyre.",
       "kicker": "The paper won an Ig Nobel and is a legitimately good fluid dynamics exercise.",
-      "tags": ["animals", "physics", "gross"],
+      "tags": [
+        "animals",
+        "physics",
+        "gross"
+      ],
       "verified": "unverified",
-      "refs": ["Meyer-Rochow VB, Gal J. Polar Biol. 2003;27:56-58."]
+      "refs": [
+        "Meyer-Rochow VB, Gal J. Polar Biol. 2003;27:56-58."
+      ]
     },
     {
       "id": "woodpecker-headache",
@@ -305,9 +393,15 @@
       ],
       "twist": "And a millisecond before impact, a muscle contracts to close the eyelids. Not to blink, but to physically hold the eyeball in place so it doesn't pop out.",
       "kicker": "Helmet designers have been copying this for years.",
-      "tags": ["animals", "biomechanics", "design"],
+      "tags": [
+        "animals",
+        "biomechanics",
+        "design"
+      ],
       "verified": "unverified",
-      "refs": ["Schwab IR. Br J Ophthalmol. 2002;86(8):843."]
+      "refs": [
+        "Schwab IR. Br J Ophthalmol. 2002;86(8):843."
+      ]
     },
     {
       "id": "full-vs-empty-bottle",
@@ -323,9 +417,15 @@
       ],
       "twist": "Empty bottles are significantly stronger. But both break well below the force needed to fracture a human skull, meaning either one can crack your head open before the glass gives way.",
       "kicker": "It won the Ig Nobel Peace Prize, and it gets cited in actual court cases.",
-      "tags": ["forensics", "violence", "legal"],
+      "tags": [
+        "forensics",
+        "violence",
+        "legal"
+      ],
       "verified": "unverified",
-      "refs": ["Bolliger SA et al. J Forensic Leg Med. 2009;16(3):138-42."]
+      "refs": [
+        "Bolliger SA et al. J Forensic Leg Med. 2009;16(3):138-42."
+      ]
     },
     {
       "id": "mri-sex",
@@ -341,9 +441,15 @@
       ],
       "twist": "The anatomy textbooks turned out to be wrong. The actual shape and angle of the penis during intercourse doesn't match the diagrams that had been printed for centuries, including Leonardo da Vinci's.",
       "kicker": "It corrected 500 years of anatomical illustration.",
-      "tags": ["medicine", "sex", "anatomy"],
+      "tags": [
+        "medicine",
+        "sex",
+        "anatomy"
+      ],
       "verified": "unverified",
-      "refs": ["Schultz WW et al. BMJ. 1999;319:1596-1600."]
+      "refs": [
+        "Schultz WW et al. BMJ. 1999;319:1596-1600."
+      ]
     },
     {
       "id": "nose-picking-survey",
@@ -359,9 +465,15 @@
       ],
       "twist": "And roughly one in five said the habit was causing them actual nasal damage, including bleeding. The researchers argued it should be classified alongside nail biting and hair pulling as a genuine compulsive behaviour.",
       "kicker": "That is why it was published in the Journal of Clinical Psychiatry.",
-      "tags": ["psychology", "gross", "teens"],
+      "tags": [
+        "psychology",
+        "gross",
+        "teens"
+      ],
       "verified": "unverified",
-      "refs": ["Andrade C, Srihari BS. J Clin Psychiatry. 2001;62(6):426-31."]
+      "refs": [
+        "Andrade C, Srihari BS. J Clin Psychiatry. 2001;62(6):426-31."
+      ]
     },
     {
       "id": "country-music-suicide",
@@ -377,9 +489,15 @@
       ],
       "twist": "The correlation held. More country airtime lined up with higher white suicide rates. Their argument was that the themes in the lyrics reinforce the conditions that lead to it.",
       "kicker": "The paper triggered years of academic argument and at least one formal rebuttal. It has never been fully settled.",
-      "tags": ["sociology", "music", "controversial"],
+      "tags": [
+        "sociology",
+        "music",
+        "controversial"
+      ],
       "verified": "unverified",
-      "refs": ["Stack S, Gundlach J. Social Forces. 1992;71(1):211-218."]
+      "refs": [
+        "Stack S, Gundlach J. Social Forces. 1992;71(1):211-218."
+      ]
     },
     {
       "id": "speed-bump-appendicitis",
@@ -395,9 +513,15 @@
       ],
       "twist": "It's a strong test. Of the patients whose pain spiked over the bumps, 97 percent of the confirmed appendicitis cases were caught. If the bumps didn't hurt, appendicitis was very unlikely.",
       "kicker": "It was published in the BMJ and it costs nothing to use.",
-      "tags": ["medicine", "diagnosis", "useful"],
+      "tags": [
+        "medicine",
+        "diagnosis",
+        "useful"
+      ],
       "verified": "unverified",
-      "refs": ["Ashdown HF et al. BMJ. 2012;345:e8012."]
+      "refs": [
+        "Ashdown HF et al. BMJ. 2012;345:e8012."
+      ]
     },
     {
       "id": "hiccup-cure",
@@ -413,9 +537,15 @@
       ],
       "twist": "So he performed a rectal massage. The hiccups stopped immediately. Two separate research teams published the same finding independently.",
       "kicker": "They shared the Ig Nobel for it. It remains in the medical literature as a legitimate last resort.",
-      "tags": ["medicine", "gross", "cure"],
+      "tags": [
+        "medicine",
+        "gross",
+        "cure"
+      ],
       "verified": "unverified",
-      "refs": ["Fesmire FM. Ann Emerg Med. 1988;17(8):872. Odeh M et al. J Intern Med. 1990;227(2):145-6."]
+      "refs": [
+        "Fesmire FM. Ann Emerg Med. 1988;17(8):872. Odeh M et al. J Intern Med. 1990;227(2):145-6."
+      ]
     },
     {
       "id": "bladder-decisions",
@@ -431,9 +561,15 @@
       ],
       "twist": "The theory is that self-control is a single shared system. Clenching to hold it in spills over into every other kind of restraint you're exercising at that moment.",
       "kicker": "It also works in reverse. That same pressure wrecks your working memory.",
-      "tags": ["psychology", "self-control", "weird-effect"],
+      "tags": [
+        "psychology",
+        "self-control",
+        "weird-effect"
+      ],
       "verified": "unverified",
-      "refs": ["Tuk MA et al. Psychol Sci. 2011;22(5):627-33."]
+      "refs": [
+        "Tuk MA et al. Psychol Sci. 2011;22(5):627-33."
+      ]
     },
     {
       "id": "opera-mice-transplant",
@@ -449,9 +585,15 @@
       ],
       "twist": "The opera group lasted 26 days. Mozart got 20. Enya got 11, and the single tones did nothing. The effect ran through the immune system, changing regulatory T cell counts.",
       "kicker": "Deaf mice showed no benefit, which confirmed they were actually hearing it, not just feeling vibrations.",
-      "tags": ["medicine", "music", "animals"],
+      "tags": [
+        "medicine",
+        "music",
+        "animals"
+      ],
       "verified": "unverified",
-      "refs": ["Uchiyama M et al. J Cardiothorac Surg. 2012;7:26."]
+      "refs": [
+        "Uchiyama M et al. J Cardiothorac Surg. 2012;7:26."
+      ]
     },
     {
       "id": "belly-button-lint",
@@ -467,9 +609,15 @@
       ],
       "twist": "The hair is the mechanism. Body hair acts as a one-way ratchet, its scales dragging clothing fibres inward toward the navel. Shaving around it makes the lint stop.",
       "kicker": "A later researcher confirmed it by analysing his own lint daily for three years.",
-      "tags": ["body", "gross", "survey"],
+      "tags": [
+        "body",
+        "gross",
+        "survey"
+      ],
       "verified": "unverified",
-      "refs": ["Kruszelnicki K. Bellybutton lint survey. 2001. Steinhauser G. Med Hypotheses. 2009;72(6):623-5."]
+      "refs": [
+        "Kruszelnicki K. Bellybutton lint survey. 2001. Steinhauser G. Med Hypotheses. 2009;72(6):623-5."
+      ]
     },
     {
       "id": "scrotum-temperature",
@@ -485,9 +633,15 @@
       ],
       "twist": "The left side runs consistently warmer than the right when clothed. And modern clothing raises the temperature on both sides enough to matter for fertility.",
       "kicker": "The Greek statues were anatomically correct. The science took 2000 years to catch up.",
-      "tags": ["medicine", "fertility", "anatomy"],
+      "tags": [
+        "medicine",
+        "fertility",
+        "anatomy"
+      ],
       "verified": "unverified",
-      "refs": ["Bengoudifa B, Mieusset R. Hum Reprod. 2007;22(6):1509-15."]
+      "refs": [
+        "Bengoudifa B, Mieusset R. Hum Reprod. 2007;22(6):1509-15."
+      ]
     },
     {
       "id": "alligator-helium",
@@ -503,9 +657,15 @@
       ],
       "twist": "The bellow shifted pitch exactly as predicted. That means alligators do use vocal tract resonance, so this ability is at least 200 million years old, inherited from the ancestors of both crocodiles and birds.",
       "kicker": "It also means we can estimate how dinosaurs sounded.",
-      "tags": ["animals", "evolution", "sound"],
+      "tags": [
+        "animals",
+        "evolution",
+        "sound"
+      ],
       "verified": "unverified",
-      "refs": ["Reber SA et al. J Exp Biol. 2015;218:2442-2447."]
+      "refs": [
+        "Reber SA et al. J Exp Biol. 2015;218:2442-2447."
+      ]
     },
     {
       "id": "heart-sync-dating",
@@ -521,9 +681,15 @@
       ],
       "twist": "What predicted it was the body. Heart rates and pupil dilation syncing up between the two people. Conscious signals were useless. The unconscious ones were reliable.",
       "kicker": "Chemistry is measurable, and you cannot fake it.",
-      "tags": ["psychology", "dating", "body"],
+      "tags": [
+        "psychology",
+        "dating",
+        "body"
+      ],
       "verified": "unverified",
-      "refs": ["Prochazkova E et al. Nat Hum Behav. 2022;6:269-278."]
+      "refs": [
+        "Prochazkova E et al. Nat Hum Behav. 2022;6:269-278."
+      ]
     },
     {
       "id": "stanford-toilet",
@@ -539,9 +705,15 @@
       ],
       "twist": "So it identifies you biometrically. Partly by fingerprint on the flush lever, and partly by a camera that scans the distinctive pattern of your anus.",
       "kicker": "The researchers call it an analprint. They say it is as unique as a fingerprint.",
-      "tags": ["technology", "medicine", "privacy"],
+      "tags": [
+        "technology",
+        "medicine",
+        "privacy"
+      ],
       "verified": "unverified",
-      "refs": ["Park S et al. Nat Biomed Eng. 2020;4:624-635."]
+      "refs": [
+        "Park S et al. Nat Biomed Eng. 2020;4:624-635."
+      ]
     },
     {
       "id": "liars-survey",
@@ -557,9 +729,15 @@
       ],
       "twist": "The researchers openly admitted the core problem: the entire dataset depends on self-reported honesty from a group selected for lying. The paper discusses this paradox seriously.",
       "kicker": "That honesty about their own limits is exactly why it's good science.",
-      "tags": ["psychology", "lying", "meta"],
+      "tags": [
+        "psychology",
+        "lying",
+        "meta"
+      ],
       "verified": "unverified",
-      "refs": ["Debey E et al. Acta Psychol. 2015;160:58-68."]
+      "refs": [
+        "Debey E et al. Acta Psychol. 2015;160:58-68."
+      ]
     }
   ]
 }

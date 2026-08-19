@@ -87,6 +87,7 @@ class Shot:
     subjects: list[str] = field(default_factory=list)
     role: str = "beat"  # hook | beat | twist | kicker
     start: float = 0.0  # when it appears, taken from the narration
+    asset: str | None = None  # stable media name, independent of order
     still_path: str | None = None
     clip_path: str | None = None
 

@@ -142,9 +142,22 @@ def _elevenlabs(text: str, out_path: Path) -> None:
         out_path.write_bytes(resp.read())
 
 
+# TTS clips arrive with a beat of silence at each end. Left in, they stack
+# into real dead air between segments — a measured 3.1s across one 36s video,
+# which on vertical video is a scroll trigger, not a dramatic pause. The
+# script's own PAUSE_AFTER puts the pauses back where they are wanted.
+TRIM_SILENCE = (
+    "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.03,"
+    "areverse,"
+    "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.03,"
+    "areverse"
+)
+
+
 def _to_wav(src: Path, dst: Path, ffmpeg: str) -> None:
     subprocess.run(
         [ffmpeg, "-y", "-loglevel", "error", "-i", str(src),
+         "-af", TRIM_SILENCE,
          "-ac", "1", "-ar", "44100", str(dst)],
         check=True,
     )

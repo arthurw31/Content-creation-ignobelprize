@@ -58,53 +58,81 @@ class _Scene:
 ROLE_LABEL = {"hook": "", "beat": "THE SETUP", "twist": "THE TWIST",
               "kicker": "AND YET"}
 
-NUMBER_WORDS = {
+UNITS = {
     "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
     "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
-    "twelve": 12, "twenty": 20, "thirty": 30, "fifty": 50, "hundred": 100,
+    "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15,
+    "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19,
 }
+TENS = {
+    "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60,
+    "seventy": 70, "eighty": 80, "ninety": 90,
+}
+
+_TENS_RE = "|".join(TENS)
+_UNITS_RE = "|".join(UNITS)
 
 
 def find_stat(text: str) -> tuple[int, str] | None:
     """Pull a number and its noun out of a beat, for a count-up call-out.
 
-    Only the first one: two competing numbers on screen read as a chart, not
-    as a fact.
+    Compounds have to be read whole. Matching bare words pulled "five" out of
+    "seventy-five" and printed 5 rats on screen instead of 75 — a wrong number
+    stated confidently is worse than no number at all. Compound spans are
+    therefore claimed first, and any bare word inside one is ignored.
+
+    Only the first figure is taken: two competing numbers read as a chart
+    rather than as a fact.
     """
-    digits = re.search(r"\b(\d[\d,]*)\b\s+([a-z]+)", text.lower())
-    if digits:
-        return int(digits.group(1).replace(",", "")), digits.group(2)
-    hits = []
-    for word, value in NUMBER_WORDS.items():
-        match = re.search(rf"\b{word}\b\s+([a-z]+)", text.lower())
-        if match:
-            hits.append((match.start(), value, match.group(1)))
-    if hits:
-        _, value, noun = min(hits)  # the one stated first, not the first key
-        return value, noun
-    return None
+    lowered = text.lower()
+    candidates: list[tuple[int, int, str]] = []
+    claimed: list[tuple[int, int]] = []
+
+    for match in re.finditer(r"\b(\d[\d,]*)\b[\s-]+([a-z]+)", lowered):
+        candidates.append((match.start(), int(match.group(1).replace(",", "")),
+                           match.group(2)))
+        claimed.append(match.span())
+
+    for match in re.finditer(rf"\b({_TENS_RE})[\s-]({_UNITS_RE})\b[\s-]+([a-z]+)",
+                             lowered):
+        value = TENS[match.group(1)] + UNITS[match.group(2)]
+        candidates.append((match.start(), value, match.group(3)))
+        claimed.append(match.span())
+
+    for table in (TENS, UNITS):
+        for word, value in table.items():
+            for match in re.finditer(rf"\b{word}\b[\s-]+([a-z]+)", lowered):
+                if any(lo <= match.start() < hi for lo, hi in claimed):
+                    continue
+                candidates.append((match.start(), value, match.group(1)))
+
+    if not candidates:
+        return None
+    _, value, noun = min(candidates, key=lambda c: (c[0], -c[1]))
+    return value, noun
 
 
 def esc(text: str) -> str:
     return html.escape(text, quote=True)
 
 
-def collect_clips(prize: Prize, count: int) -> list[str | None]:
-    """Copy generated media into assets/ and return per-shot paths.
+def collect_clips(prize: Prize, names: list[str | None]) -> list[str | None]:
+    """Copy generated media into assets/ and return one path per scene.
 
-    A graded video clip wins when one exists. Otherwise a generated still is
-    used and the camera move carries the motion — which is the normal case
-    here, because OpenRouter serves no video model on this account.
+    Lookup is by asset name, not position, so the edit can be reordered or a
+    shot reused twice without regenerating anything. A graded clip wins over
+    a still; a still still works when no clip exists.
     """
     base = ROOT / "out" / f".ai-{prize.id}"
     assets = PROJECT / "assets"
     assets.mkdir(parents=True, exist_ok=True)
     found: list[str | None] = []
-    for i in range(count):
+    for i, name in enumerate(names):
+        key = name or f"shot{i:02d}"
         for folder, suffix in (("graded", "mp4"), ("stills", "png")):
-            src = base / folder / f"shot{i:02d}.{suffix}"
+            src = base / folder / f"{key}.{suffix}"
             if src.exists():
-                dst = assets / f"{prize.id}-shot{i:02d}.{suffix}"
+                dst = assets / f"{prize.id}-{key}.{suffix}"
                 shutil.copy2(src, dst)
                 found.append(f"assets/{dst.name}")
                 break
@@ -124,10 +152,12 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
     # the words it illustrates. Without a shot list each narration segment is
     # its own scene, which is far less illustrated but needs no generation.
     if shots:
-        scene_specs = [{"start": sh.start, "role": sh.role} for sh in shots]
+        scene_specs = [{"start": sh.start, "role": sh.role, "asset": sh.asset}
+                       for sh in shots]
     else:
-        scene_specs = [{"start": sg.start, "role": sg.role} for sg in segments]
-    clips = collect_clips(prize, len(scene_specs))
+        scene_specs = [{"start": sg.start, "role": sg.role, "asset": None}
+                       for sg in segments]
+    clips = collect_clips(prize, [spec["asset"] for spec in scene_specs])
 
     # The voiceover is one element spanning the whole composition. Segment
     # timings were already re-fitted to this exact file before we got here,
@@ -335,6 +365,7 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
                 return idx
         return 0
 
+    scrim_moves: dict[float, int] = {}
     caption_html: list[str] = []
     for ci, chunk in enumerate(chunk_words(script.words)):
         role = segments[chunk[0].segment_index].role
@@ -345,6 +376,7 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
         # Sit where this shot has the least going on, so the type never lands
         # on the rat's face.
         top = caption_y.get(scene_at(chunk[0].start), theme.CAPTION_Y)
+        scrim_moves.setdefault(round(chunk[0].start, 2), top)
         caption_html.append(
             f'<div class="cap" id="cap{ci}" style="top:{top}px">{words}</div>'
         )
@@ -368,6 +400,24 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
                 f'{word.end:.2f});'
             )
 
+    # The badge says what this is, then leaves. Holding it for the whole
+    # video keeps signalling "award explainer" over every frame.
+    first_top = scrim_moves[min(scrim_moves)] if scrim_moves else theme.CAPTION_Y
+    tweens.append(f'tl.set(q("capscrim"), {{y:{first_top - 150}}}, 0);')
+    previous_top = None
+    for when, top in sorted(scrim_moves.items()):
+        if top == previous_top:
+            continue
+        previous_top = top
+        tweens.append(
+            f'tl.to(q("capscrim"), {{y:{top - 150}, duration:0.2, '
+            f'ease:"power2.out"}}, {max(when - 0.2, 0):.2f});'
+        )
+
+    tweens.append(
+        'tl.to(q("badge"), {opacity:0, y:-20, duration:0.4, '
+        'ease:"power2.in"}, 3.0);'
+    )
     tweens.append(
         f'tl.fromTo(q("progfill"), {{width:"0%"}}, '
         f'{{width:"100%", duration:{duration}, ease:"none"}}, 0);'
@@ -418,6 +468,12 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
       .bar-track {{ height:16px; background:rgba(255,255,255,.16); border-radius:8px; }}
       .bar-fill {{ height:100%; width:0%; background:{ACCENT}; border-radius:8px; }}
       .caption-layer {{ position:absolute; inset:0; z-index:7; }}
+      .cap-scrim {{
+        position:absolute; left:0; right:0; top:0; height:300px; z-index:6;
+        pointer-events:none; will-change:transform;
+        background:radial-gradient(ellipse 70% 50% at 50% 50%,
+          rgba(0,0,0,.72) 0%, rgba(0,0,0,.45) 55%, rgba(0,0,0,0) 100%);
+      }}
       .cap {{
         position:absolute; left:80px; right:80px;
         transform:translateY(-50%); text-align:center; opacity:0;
@@ -441,12 +497,13 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
            data-duration="{duration}" data-track-index="2">
         <div class="vignette"></div>
         {"".join(labels)}
-        <div class="badge">{esc(prize.badge)}</div>
+        <div class="badge" id="badge">{esc(prize.badge)}</div>
         {"".join(graphics)}
       </div>
 
       <div class="clip caption-layer" id="caps" data-start="0"
            data-duration="{duration}" data-track-index="3">
+        <div class="cap-scrim" id="capscrim"></div>
         {"".join(caption_html)}
       </div>
 
