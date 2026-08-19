@@ -3,11 +3,12 @@
 Every request shape here was verified against the live API on 2026-08-19 with
 a real key, not written from documentation. What that probe established:
 
-* **No video models exist on this account.** The catalogue holds 415 models:
-  400 text, 11 image+text, 4 audio+text. No Veo, Sora, Seedance or Wan, and
-  `/api/v1/videos` returns 404. Generative *footage* is therefore not
-  available through OpenRouter here; `generate_video` raises rather than
-  pretending otherwise. Stills plus a camera move carry the picture instead.
+* **Video is missing from `/api/v1/models`.** That catalogue lists only text,
+  image and audio, which is misleading: video generation lives behind an
+  asynchronous `POST /api/v1/videos`, and a plain GET on that path returns
+  404 — which is what made an earlier probe wrongly conclude video was
+  unavailable. Veo 3.1, Seedance and Grok Imagine are all reachable.
+  Image-to-video through `frame_images` is what holds the look together.
 * **Images** come from `/chat/completions` with `modalities: ["image","text"]`,
   and `image_config.aspect_ratio` is honoured — "9:16" returns 768x1344.
   Roughly $0.039 per image on gemini-2.5-flash-image.
@@ -206,18 +207,83 @@ def generate_speech(text: str, out_path: Path, model: str = TTS_MODEL,
     return out_path, cost
 
 
-# --- video (not available here) --------------------------------------------
+# --- video -----------------------------------------------------------------
+# Video models are NOT listed by /api/v1/models — that catalogue only carries
+# text, image and audio. They live behind POST /api/v1/videos, which is
+# asynchronous: submit, poll, then download. A GET on that path returns 404,
+# which is what made an earlier probe wrongly conclude video was unavailable.
 
-def generate_video(*_args, **_kwargs):
-    raise VideoUnavailable(
-        "OpenRouter serves no video-generation model on this account: the "
-        "catalogue has 400 text, 11 image and 4 audio models, and there is no "
-        "/videos endpoint. Use generate_image and animate the still, or bring "
-        "a dedicated video provider (fal.ai, Replicate, Higgsfield)."
-    )
+VIDEO_MODEL = os.environ.get("IGNOBEL_VIDEO_MODEL", "bytedance/seedance-2.0-mini")
+
+# Seedance refuses anything under four seconds. Shots are usually shorter than
+# that, so clips get trimmed to the shot length afterwards.
+MIN_VIDEO_SECONDS = 4
 
 
-submit_video = generate_video
+def submit_video(prompt: str, seconds: float, model: str = VIDEO_MODEL,
+                 first_frame: Path | str | None = None,
+                 seed: int | None = None,
+                 aspect_ratio: str = "9:16") -> str:
+    """Queue one generation. Returns the job id.
+
+    Passing first_frame makes this image-to-video: the still fixes subject,
+    composition and palette, and the model only has to animate it. That is
+    what holds the look together across a dozen shots.
+    """
+    payload: dict = {
+        "model": model,
+        "prompt": prompt,
+        "duration": max(int(round(seconds)), MIN_VIDEO_SECONDS),
+        "aspect_ratio": aspect_ratio,
+    }
+    if seed is not None:
+        payload["seed"] = seed
+    if first_frame:
+        payload["frame_images"] = [{
+            "type": "image_url",
+            "image_url": {"url": _as_data_uri(Path(first_frame))},
+            "frame_type": "first_frame",
+        }]
+
+    data = _post("/videos", payload)
+    job = data.get("id")
+    if not job:
+        raise OpenRouterError(f"no job id in response: {str(data)[:300]}")
+    return job
+
+
+def poll_video(job: str) -> dict:
+    """One status read. Terminal states are completed / failed."""
+    return _get(f"/videos/{job}")
+
+
+def fetch_video(job: str, out_path: Path) -> Path:
+    req = urllib.request.Request(f"{BASE}/videos/{job}/content?index=0",
+                                 headers=_headers())
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with urllib.request.urlopen(req, timeout=600) as resp:
+        out_path.write_bytes(resp.read())
+    return out_path
+
+
+def generate_video(prompt: str, seconds: float, out_path: Path,
+                   poll_interval: float = 6.0, timeout: float = 900,
+                   **kwargs) -> tuple[Path, float]:
+    """Submit, wait, download. Returns the path and cost in USD."""
+    import time
+
+    job = submit_video(prompt, seconds, **kwargs)
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        state = poll_video(job)
+        status = state.get("status")
+        if status in {"completed", "succeeded"}:
+            cost = float((state.get("usage") or {}).get("cost") or 0.0)
+            return fetch_video(job, out_path), cost
+        if status in {"failed", "error", "cancelled"}:
+            raise OpenRouterError(f"video job {job} {status}: {str(state)[:300]}")
+        time.sleep(poll_interval)
+    raise OpenRouterError(f"video job {job} still running after {timeout:.0f}s")
 
 
 # --- helpers ---------------------------------------------------------------

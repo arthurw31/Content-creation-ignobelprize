@@ -37,12 +37,16 @@ MIN_SHOT_SECONDS = 1.4
 # narration that the shot illustrates; timing comes from when it is spoken.
 HANDWRITTEN: dict[str, list[dict]] = {
     "polyester-rats": [
+        # No person in frame. Seedance rejects a first frame it thinks holds a
+        # real person ("InputImageSensitiveContentDetected.PrivacyInformation"),
+        # so shots that would show the researcher are staged around him.
         {"cue": "A scientist put",
-         "still": "A 1970s researcher in a white lab coat lifting a white "
-                  "laboratory rat out of a wire cage with both hands, seen "
-                  "from chest height, cluttered lab bench behind",
-         "action": "The hands lift the rat gently. The camera holds steady",
-         "subjects": ["scientist", "lab"]},
+         "still": "A white laboratory rat inside a wire cage on a cluttered "
+                  "1970s laboratory bench, looking out through the bars, warm "
+                  "lamp light raking across the wire",
+         "action": "The rat sniffs at the bars and turns its head. The camera "
+                   "pushes in very slowly",
+         "subjects": ["lab"]},
         {"cue": "tiny polyester pants",
          "still": "Extreme close-up of tiny tailored trousers made of shiny "
                   "synthetic fabric being pulled onto the hind legs of a "

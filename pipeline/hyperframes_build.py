@@ -164,17 +164,10 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
                      duration=span[i])
         sid = f"sc{seg.index}"
         clip = clips[seg.index]
-        if clip and clip.endswith(".mp4"):
-            media = (f'<video id="{sid}v" class="media" src="{clip}" muted '
-                     f'playsinline></video>')
-        elif clip:
-            media = f'<img id="{sid}v" class="media" src="{clip}" alt="" data-layout-allow-overflow />'
-        else:
-            media = f'<div id="{sid}v" class="media gradient"></div>'
+        is_video = bool(clip) and clip.endswith(".mp4")
 
         label = ROLE_LABEL.get(seg.role, "") if seg.role != previous_role else ""
         previous_role = seg.role
-        label_html = ""
         if label:
             labels.append(
                 f'<div class="role-label" id="{sid}l">{esc(label)}</div>'
@@ -189,30 +182,48 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
                 f'{marks[seg.index] + span[seg.index] - 0.35:.2f});'
             )
 
-        scenes.append(
-            f'<div class="clip scene" id="{sid}" data-start="{marks[seg.index]:.2f}" '
-            f'data-duration="{span[seg.index]:.2f}" data-track-index="0" '
-            f'style="--bg:{ROLE_BG.get(seg.role, ROLE_BG["beat"])}">'
-            f'{media}{label_html}</div>'
-        )
+        timing = (f'data-start="{marks[seg.index]:.2f}" '
+                  f'data-duration="{span[seg.index]:.2f}" '
+                  f'data-track-index="0"')
 
-        # Stills have to carry the motion themselves, so every scene gets a
-        # slow move: alternating push-in and pull-back, with a small drift
-        # across it. A single repeated zoom direction reads as a slideshow.
-        zoom_in = seg.index % 2 == 0
-        z0, z1 = (1.04, 1.16) if zoom_in else (1.16, 1.04)
-        dx = 2.5 if seg.index % 4 in (0, 3) else -2.5
-        tweens.append(
-            f'tl.fromTo(q("{sid}v"), {{scale:{z0}, xPercent:{-dx}, yPercent:{dx / 2}}}, '
-            f'{{scale:{z1}, xPercent:{dx}, yPercent:{-dx / 2}, '
-            f'duration:{span[seg.index]:.2f}, ease:"none"}}, '
-            f'{marks[seg.index]:.2f});'
-        )
-        if label:
+        # The media element IS the clip. A <video> nested inside another timed
+        # element is frozen at render time — the linter rejects it outright.
+        if is_video:
+            scenes.append(
+                f'<video class="clip media" id="{sid}v" src="{clip}" muted '
+                f'playsinline {timing} data-media-start="0" '
+                f'data-layout-allow-overflow></video>'
+            )
+        elif clip:
+            scenes.append(
+                f'<img class="clip media" id="{sid}v" src="{clip}" alt="" '
+                f'{timing} data-layout-allow-overflow />'
+            )
+        else:
+            scenes.append(
+                f'<div class="clip media gradient" id="{sid}v" {timing} '
+                f'style="--bg:{ROLE_BG.get(seg.role, ROLE_BG["beat"])}"></div>'
+            )
+
+        # Generated footage already moves, so it only gets a slight drift.
+        # A still has to carry the motion itself, so it gets the full move,
+        # alternating direction so a run of shots never reads as a slideshow.
+        if is_video:
             tweens.append(
-                f'tl.fromTo(q("{sid}l"), {{opacity:0, x:-30}}, '
-                f'{{opacity:1, x:0, duration:0.45, ease:"power3.out"}}, '
-                f'{seg.start + 0.1:.2f});'
+                f'tl.fromTo(q("{sid}v"), {{scale:1.0}}, '
+                f'{{scale:1.05, duration:{span[seg.index]:.2f}, ease:"none"}}, '
+                f'{marks[seg.index]:.2f});'
+            )
+        else:
+            zoom_in = seg.index % 2 == 0
+            z0, z1 = (1.04, 1.16) if zoom_in else (1.16, 1.04)
+            dx = 2.5 if seg.index % 4 in (0, 3) else -2.5
+            tweens.append(
+                f'tl.fromTo(q("{sid}v"), '
+                f'{{scale:{z0}, xPercent:{-dx}, yPercent:{dx / 2}}}, '
+                f'{{scale:{z1}, xPercent:{dx}, yPercent:{-dx / 2}, '
+                f'duration:{span[seg.index]:.2f}, ease:"none"}}, '
+                f'{marks[seg.index]:.2f});'
             )
 
     # --- transitions --------------------------------------------------------
