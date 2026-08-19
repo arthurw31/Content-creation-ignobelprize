@@ -2,8 +2,13 @@
 
 Providers:
     none        - silent track, captions carry the video (works offline)
+    elevenlabs  - ELEVENLABS_API_KEY, its own service and its own key
+    openrouter  - OPENROUTER_API_KEY, routes to OpenAI/Gemini/Grok/Voxtral
     openai      - OPENAI_API_KEY
-    elevenlabs  - ELEVENLABS_API_KEY
+
+ElevenLabs is not resold through OpenRouter, so the two are separate keys.
+Preference order in "auto" mode is ElevenLabs first, because it is still the
+best read for a deadpan documentary narrator.
 
 Each segment is synthesised separately. That is what lets the renderer
 re-time the video to the real audio instead of guessing, and it means one
@@ -40,6 +45,8 @@ def available_provider(requested: str) -> str:
         return requested
     if os.environ.get("ELEVENLABS_API_KEY"):
         return "elevenlabs"
+    if os.environ.get("OPENROUTER_API_KEY"):
+        return "openrouter"
     if os.environ.get("OPENAI_API_KEY"):
         return "openai"
     return "none"
@@ -61,6 +68,8 @@ def synthesize(segments: list[Segment], provider: str, out_dir: Path,
         if not wav.exists():
             if provider == "openai":
                 _openai(seg.text, raw)
+            elif provider == "openrouter":
+                _openrouter(seg.text, raw)
             elif provider == "elevenlabs":
                 _elevenlabs(seg.text, raw)
             else:
@@ -93,6 +102,32 @@ def _openai(text: str, out_path: Path) -> None:
                  "Content-Type": "application/json"},
     )
     with urllib.request.urlopen(req, timeout=120) as resp:
+        out_path.write_bytes(resp.read())
+
+
+def _openrouter(text: str, out_path: Path) -> None:
+    """Same request shape as OpenAI's, which is what OpenRouter mirrors."""
+    import json
+    import urllib.request
+
+    key = os.environ.get("OPENROUTER_API_KEY")
+    if not key:
+        raise TTSUnavailable("OPENROUTER_API_KEY is not set")
+
+    payload = json.dumps({
+        "model": os.environ.get("IGNOBEL_OR_TTS_MODEL", "openai/gpt-4o-mini-tts"),
+        "voice": OPENAI_VOICE,
+        "input": text,
+        "response_format": "mp3",
+    }).encode()
+
+    req = urllib.request.Request(
+        "https://openrouter.ai/api/v1/audio/speech",
+        data=payload,
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(req, timeout=180) as resp:
         out_path.write_bytes(resp.read())
 
 

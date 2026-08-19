@@ -127,6 +127,22 @@ Scenes use generated AI clips when `out/.ai-<prize>/graded/` holds them, and
 fall back to gradient cards when it does not, so the composition renders with
 or without the generative step.
 
+### Voiceover in the HyperFrames path
+
+```bash
+export ELEVENLABS_API_KEY=...      # or OPENROUTER_API_KEY
+python scripts/make_hyperframes.py --prize polyester-rats --render
+```
+
+The narration is synthesised per segment, then **the script is re-fitted to
+the real audio before the composition is generated** — so cuts, captions and
+stat call-outs land on the words instead of on a word-count estimate. On the
+demo that moved the runtime from an estimated 32.5s to an actual 35.0s.
+
+ElevenLabs is a separate service with its own key; it is not resold through
+OpenRouter. `--voice` picks the provider explicitly, and `auto` prefers
+ElevenLabs, then OpenRouter, then OpenAI.
+
 Note FFmpeg does not disappear here — HyperFrames shells out to it for
 encoding and refuses to start without `ffmpeg` and `ffprobe` on `PATH`.
 

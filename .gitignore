@@ -17,4 +17,6 @@ probe-resultat.txt
 # hyperframes project
 hyperframes/node_modules/
 hyperframes/assets/*.mp4
+hyperframes/assets/*.wav
+hyperframes/assets/*.mp3
 hyperframes/out*.mp4

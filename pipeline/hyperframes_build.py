@@ -95,11 +95,27 @@ def collect_clips(prize: Prize, count: int) -> list[str | None]:
     return found
 
 
-def build(prize: Prize, script: VideoScript, out_path: Path | None = None) -> Path:
+def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
+          voice_track: Path | None = None) -> Path:
     out_path = out_path or PROJECT / "index.html"
     duration = round(script.duration, 2)
     segments = script.segments
     clips = collect_clips(prize, len(segments))
+
+    # The voiceover is one element spanning the whole composition. Segment
+    # timings were already re-fitted to this exact file before we got here,
+    # so it lines up with the captions by construction.
+    voice_html = ""
+    if voice_track and voice_track.exists():
+        assets = PROJECT / "assets"
+        assets.mkdir(parents=True, exist_ok=True)
+        dst = assets / f"{prize.id}-voice{voice_track.suffix}"
+        shutil.copy2(voice_track, dst)
+        voice_html = (
+            f'<audio class="clip" id="voice" src="assets/{dst.name}" '
+            f'data-start="0" data-duration="{duration}" data-track-index="5" '
+            f'data-volume="1"></audio>'
+        )
 
     scenes: list[str] = []
     tweens: list[str] = []
@@ -312,6 +328,8 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None) -> Pa
            data-duration="{duration}" data-track-index="4">
         <div class="progress-fill" id="progfill"></div>
       </div>
+
+      {voice_html}
     </div>
 
     <script>
