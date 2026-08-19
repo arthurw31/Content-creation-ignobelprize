@@ -86,6 +86,7 @@ class Shot:
     generate_seconds: float = 5.0  # how long we ask the model for
     subjects: list[str] = field(default_factory=list)
     role: str = "beat"  # hook | beat | twist | kicker
+    start: float = 0.0  # when it appears, taken from the narration
     still_path: str | None = None
     clip_path: str | None = None
 

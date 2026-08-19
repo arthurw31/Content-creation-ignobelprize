@@ -163,6 +163,16 @@ python scripts/make_ai_video.py --prize polyester-rats --dry-run
 python scripts/make_ai_video.py --prize polyester-rats --budget 8
 ```
 
+Shots are cut against the narration, not against the paragraph. Each entry in
+`HANDWRITTEN` declares a `cue` — the words it illustrates — and its start is
+taken from when those words are actually spoken, after the script has been
+re-timed to the real audio. When the narrator says "tiny polyester pants", the
+frame showing tiny polyester pants is already on screen. The demo runs 13
+shots at a 2.7s average.
+
+`python scripts/make_hyperframes.py --prize X --shots` prints the shot list
+with its narration timings.
+
 Style coherence across a 30s video is enforced structurally, not by prompt
 luck. See `pipeline/aiclip/style.py` — one locked style suffix on every
 prompt, image-to-video rather than text-to-video, reference sheets for

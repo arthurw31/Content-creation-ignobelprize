@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from pipeline import render as ffrender, tts  # noqa: E402
+from pipeline.aiclip.plan import describe, plan_shots  # noqa: E402
 from pipeline.hyperframes_build import PROJECT, build  # noqa: E402
 from pipeline.models import Prize, load_prize  # noqa: E402
 from pipeline.script_writer import write_script  # noqa: E402
@@ -66,6 +67,8 @@ def main() -> int:
     parser.add_argument("--render", action="store_true")
     parser.add_argument("--check", action="store_true",
                         help="full check: lint, runtime, layout, motion, contrast")
+    parser.add_argument("--shots", action="store_true",
+                        help="print the shot list with its narration timings")
     parser.add_argument("--voice", default="auto",
                         choices=["auto", "none", "elevenlabs", "openrouter", "openai"])
     args = parser.parse_args()
@@ -73,7 +76,13 @@ def main() -> int:
     prize = load_prize(DATA, args.prize)
     script = write_script(prize)
     voice_track = build_voice(prize, script, args.voice)
-    path = build(prize, script, voice_track=voice_track)
+
+    # Shots are planned after the script is re-timed to the real narration, so
+    # each cue lands on the moment its words are actually spoken.
+    shots, _ = plan_shots(prize, script)
+    if args.shots:
+        print(describe(shots, {}))
+    path = build(prize, script, voice_track=voice_track, shots=shots)
     print(f"wrote {path.relative_to(ROOT)}  ({script.duration:.1f}s)")
 
     if hf("lint") != 0:

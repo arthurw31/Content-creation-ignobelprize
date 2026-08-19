@@ -118,6 +118,7 @@ def _openrouter(text: str, out_path: Path) -> None:
         "model": os.environ.get("IGNOBEL_OR_TTS_MODEL", "openai/gpt-4o-mini-tts"),
         "voice": OPENAI_VOICE,
         "input": text,
+        "instructions": NARRATION_STYLE,
         "response_format": "mp3",
     }).encode()
 

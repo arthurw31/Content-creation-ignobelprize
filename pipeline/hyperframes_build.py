@@ -24,6 +24,7 @@ from __future__ import annotations
 import html
 import re
 import shutil
+from dataclasses import dataclass
 from pathlib import Path
 
 from .captions import chunk_words
@@ -43,6 +44,16 @@ ROLE_BG = {
     "twist": "radial-gradient(circle at 50% 45%, #7a2418 0%, #2b0f0c 70%)",
     "kicker": "radial-gradient(circle at 55% 50%, #162624 0%, #0b1211 72%)",
 }
+
+@dataclass
+class _Scene:
+    """A scene on track 0: either one shot, or one narration segment."""
+
+    index: int
+    role: str
+    start: float
+    duration: float
+
 
 ROLE_LABEL = {"hook": "", "beat": "THE SETUP", "twist": "THE TWIST",
               "kicker": "AND YET"}
@@ -96,11 +107,19 @@ def collect_clips(prize: Prize, count: int) -> list[str | None]:
 
 
 def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
-          voice_track: Path | None = None) -> Path:
+          voice_track: Path | None = None, shots: list | None = None) -> Path:
     out_path = out_path or PROJECT / "index.html"
     duration = round(script.duration, 2)
     segments = script.segments
-    clips = collect_clips(prize, len(segments))
+
+    # Scenes come from the shot list when there is one, so the picture cuts on
+    # the words it illustrates. Without a shot list each narration segment is
+    # its own scene, which is far less illustrated but needs no generation.
+    if shots:
+        scene_specs = [{"start": sh.start, "role": sh.role} for sh in shots]
+    else:
+        scene_specs = [{"start": sg.start, "role": sg.role} for sg in segments]
+    clips = collect_clips(prize, len(scene_specs))
 
     # The voiceover is one element spanning the whole composition. Segment
     # timings were already re-fitted to this exact file before we got here,
@@ -126,12 +145,15 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
     # and each scene's length is derived from the next one's start. Rounding
     # start and duration independently leaves 10ms gaps or overlaps, and the
     # linter rejects overlapping clips on one track.
-    marks = [round(seg.start, 2) for seg in segments] + [duration]
-    span = {seg.index: round(marks[i + 1] - marks[i], 2)
-            for i, seg in enumerate(segments)}
+    marks = [round(spec["start"], 2) for spec in scene_specs] + [duration]
+    span = {i: round(marks[i + 1] - marks[i], 2)
+            for i in range(len(scene_specs))}
 
     # --- scenes -------------------------------------------------------------
-    for seg in segments:
+    previous_role = None
+    for i, spec in enumerate(scene_specs):
+        seg = _Scene(index=i, role=spec["role"], start=marks[i],
+                     duration=span[i])
         sid = f"sc{seg.index}"
         clip = clips[seg.index]
         if clip:
@@ -140,7 +162,8 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
         else:
             media = f'<div id="{sid}v" class="media gradient"></div>'
 
-        label = ROLE_LABEL.get(seg.role, "")
+        label = ROLE_LABEL.get(seg.role, "") if seg.role != previous_role else ""
+        previous_role = seg.role
         label_html = (f'<div class="role-label" id="{sid}l">{esc(label)}</div>'
                       if label else "")
 
@@ -148,7 +171,7 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
             f'<div class="clip scene" id="{sid}" data-start="{marks[seg.index]:.2f}" '
             f'data-duration="{span[seg.index]:.2f}" data-track-index="0" '
             f'style="--bg:{ROLE_BG.get(seg.role, ROLE_BG["beat"])}">'
-            f'{media}<div class="vignette"></div>{label_html}</div>'
+            f'{media}{label_html}</div>'
         )
 
         # A slow push-in on every scene, so nothing ever sits perfectly still.
@@ -165,7 +188,9 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
             )
 
     # --- transitions --------------------------------------------------------
-    for seg in segments[1:]:
+    for i in range(1, len(scene_specs)):
+        seg = _Scene(index=i, role=scene_specs[i]["role"], start=marks[i],
+                     duration=span[i])
         tid = f"wp{seg.index}"
         start = max(marks[seg.index] - 0.18, 0)
         colour = ACCENT_ALT if seg.role == "twist" else ACCENT
@@ -315,6 +340,7 @@ def build(prize: Prize, script: VideoScript, out_path: Path | None = None,
 
       <div class="clip graphics-layer" id="gfx" data-start="0"
            data-duration="{duration}" data-track-index="2">
+        <div class="vignette"></div>
         <div class="badge">{esc(prize.badge)}</div>
         {"".join(graphics)}
       </div>
